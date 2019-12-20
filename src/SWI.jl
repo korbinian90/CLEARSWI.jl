@@ -1,5 +1,12 @@
+
 module SWI
 
-greet() = print("Hello World!")
+using MRI, Statistics
 
-end # module
+include("tissue.jl")
+include("utility.jl")
+include("functions.jl")
+
+export calculateSWI, createMIP, saveconfiguration, Data, Options
+
+end
