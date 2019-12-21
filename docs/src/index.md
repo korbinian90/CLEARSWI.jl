@@ -1,3 +1,9 @@
+#  Documentation
+
+```@docs
+calculateSWI(x)
+```
+
 # SWI.jl
 
 ```@index

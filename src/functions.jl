@@ -1,3 +1,9 @@
+
+"""
+    calculateSWI(data, options)
+
+Returns the calculated SWI using 'data' and 'options'.
+"""
 function calculateSWI(data, options)
     if !options.writesteps
         options.writedir = nothing
