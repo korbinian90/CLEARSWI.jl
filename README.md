@@ -7,3 +7,6 @@
 [![Codecov](https://codecov.io/gh/korbinian90/SWI.jl/branch/master/graph/badge.svg)](https://codecov.io/gh/korbinian90/SWI.jl)
 [![Coveralls](https://coveralls.io/repos/github/korbinian90/SWI.jl/badge.svg?branch=master)](https://coveralls.io/github/korbinian90/SWI.jl?branch=master)
 [![Build Status](https://api.cirrus-ci.com/github/korbinian90/SWI.jl.svg)](https://cirrus-ci.com/github/korbinian90/SWI.jl)
+
+Requirement:
+import Pkg; Pkg.add("https://github.com/korbinian90/MRI.jl")
