@@ -4,7 +4,7 @@
 
 Returns the calculated SWI using 'data' and 'options'.
 """
-function calculateSWI(data, options)
+function calculateSWI(data, options=Options())
     if !options.writesteps
         options.writedir = nothing
     end
