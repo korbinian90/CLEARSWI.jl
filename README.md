@@ -31,12 +31,19 @@ This is a simple multi-echo case without changing default behavior
 using SWI
 
 TEs = [4,8,12]
-mag = readmag("Mag.nii")
-phase = readphase("Phase.nii")
+nifti_folder = SWI.dir("test","testData","small")
+magfile = joinpath(nifti_folder, "Mag.nii")
+phasefile = joinpath(nifti_folder, "Phase.nii")
+
+mag = readmag(magfile)
+phase = readphase(phasefile)
 data = Data(mag, phase, mag.header, TEs)
 
 swi = calculateSWI(data)
 mip = createMIP(swi)
+
+savenii(swi, "<outputpath>/swi.nii"; header=mag.header)
+savenii(mip, "<outputpath>/mip.nii"; header=mag.header)
 ```
 
 ## License
