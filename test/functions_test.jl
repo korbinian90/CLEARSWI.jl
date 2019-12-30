@@ -9,8 +9,7 @@ hdr = mag_nii.header
 phase_nii = readphase("$data_path/Phase.nii")
 
 data = Data(mag_nii, phase_nii, hdr, TEs)
-o = Options()
 
-swi = calculateSWI(data, o)
+swi = calculateSWI(data)
 
 printstyled("Tests Passed!"; color=:green)

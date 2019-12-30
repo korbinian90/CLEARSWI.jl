@@ -101,7 +101,7 @@ uuid = "56ddb016-857b-54e1-b83d-db4d58db5568"
 [[MRI]]
 deps = ["FFTW", "Interpolations", "NIfTI", "Statistics", "Test"]
 git-tree-sha1 = "c0933fb53bac661e120fe3c03592d324bec579ab"
-repo-rev = "development"
+repo-rev = "master"
 repo-url = "https://github.com/korbinian90/MRI.jl"
 uuid = "557dad86-b9bd-4533-8525-1a39684d020f"
 version = "0.1.0"
