@@ -17,7 +17,7 @@ function getswimag(data, options)
 
     sensitivity = options.sensitivity
     if sensitivity === nothing
-        sensitivity = getsensitivity(data.mag[:,:,:,1], pixdim = getpixdim(data))
+        sensitivity = getsensitivity(data.mag[:,:,:,1], pixdim=getpixdim(data))
     end
 
     @debug savenii(sensitivity, "sensitivity", options.writedir, data.header)
@@ -27,12 +27,10 @@ end
 function combine_echoes_swi(mag, TEs, type)
     T2s, factor = gettissue_easy(:B7T)
 
-    if type == :SNR
-        if ndims(mag) == 3 # only one echo
-            copy(mag)
-        else
-            RSS(mag)
-        end
+    if ndims(mag) == 3 # only one echo
+        copy(mag)
+    elseif type == :SNR
+        RSS(mag)
     elseif typeof(type) <: Pair
         type, (w1, w2) = type
         if type == :CNR
@@ -79,7 +77,8 @@ function getcombinedphase(data, options, mask)
         @debug savenii(unwrapped, "unwrappedphase", options.writedir, data.header)
 
         for iEco in 1:size(phase, 4)
-            unwrapped[:,:,:,iEco] .-= gaussiansmooth3d(unwrapped[:,:,:,iEco], σ; mask = mask, dims = 1:2)
+            smoothed = gaussiansmooth3d(unwrapped[:,:,:,iEco], σ; mask=mask, dims=1:2)
+            unwrapped[:,:,:,iEco] .-= smoothed
         end
         combined = combine_echoes(unwrapped, mag, TEs)
         @debug savenii(unwrapped, "filteredphase", options.writedir, data.header)
@@ -88,7 +87,8 @@ function getcombinedphase(data, options, mask)
     elseif unwrapping == :laplacianslice
         for iEco in 1:size(phase, 4), iSlc in 1:size(phase, 3)
             unwrapped[:,:,iSlc,iEco] .= laplacianunwrap(view(phase,:,:,iSlc,iEco))
-            unwrapped[:,:,iSlc,iEco] .-= gaussiansmooth3d(unwrapped[:,:,iSlc,iEco], σ; mask = mask[:,:,iSlc], dims = 1:2)
+            smoothed = gaussiansmooth3d(unwrapped[:,:,iSlc,iEco], σ; mask=mask[:,:,iSlc], dims=1:2)
+            unwrapped[:,:,iSlc,iEco] .-= smoothed
         end
         combined = combine_echoes(unwrapped, mag, TEs)
         @debug savenii(unwrapped, "unwrapped", options.writedir, data.header)
@@ -111,14 +111,14 @@ function getcombinedphase(data, options, mask)
     combined
 end
 
-combine_echoes(unwrapped::AbstractArray{T,3}, mag, TEs) where T   = copy(unwrapped) # only one echo
+combine_echoes(unwrapped::AbstractArray{T,3}, mag, TEs) where T = copy(unwrapped) # one echo
 function combine_echoes(unwrapped::AbstractArray{T,4}, mag, TEs) where T
     dim = 4
     TEs = reshape(TEs, ones(Int, dim-1)..., length(TEs)) # size = (1,1,1,nEco)
 
-    combined = sum(unwrapped .* mag; dims = dim)
-    combined ./= sum(mag .* Float32.(TEs); dims = dim)
-    dropdims(combined; dims = dim)
+    combined = sum(unwrapped .* mag; dims=dim)
+    combined ./= sum(mag .* Float32.(TEs); dims=dim)
+    dropdims(combined; dims=dim)
 end
 
 function scaleandthreshold!(swiphase, mask, mode, level)
@@ -150,5 +150,7 @@ function scaleandthreshold!(swiphase, mask, mode, level)
     swiphase
 end
 
-createMIP(S, d = 7) = [minimum(S[x,y,z:z+d-1]) for x in 1:size(S,1), y in 1:size(S,2), z in 1:size(S,3)-d+1]
+function createMIP(S, d=7)
+    [minimum(S[x,y,z:z+d-1]) for x in 1:size(S,1), y in 1:size(S,2), z in 1:size(S,3)-d+1]
+end
 getpixdim(data) = data.header.pixdim[2:(1+ndims(data.mag))]
