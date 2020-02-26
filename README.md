@@ -20,7 +20,7 @@ Magnitude and Phase images in NIfTI fileformat (4D images with echoes in the 4th
 Open the REPL in Julia and type
 
 ```julia
-import Pkg;
+using Pkg
 Pkg.add(PackageSpec(url="https://github.com/korbinian90/MRI.jl"))
 Pkg.add(PackageSpec(url="https://github.com/korbinian90/SWI.jl"))
 ```
@@ -35,15 +35,15 @@ nifti_folder = SWI.dir("test","testData","small")
 magfile = joinpath(nifti_folder, "Mag.nii")
 phasefile = joinpath(nifti_folder, "Phase.nii")
 
-mag = readmag(magfile)
-phase = readphase(phasefile)
+mag = SWI.readmag(magfile)
+phase = SWI.readphase(phasefile)
 data = Data(mag, phase, mag.header, TEs)
 
-swi = calculateSWI(data)
-mip = createMIP(swi)
+swi = SWI.calculateSWI(data)
+mip = SWI.createMIP(swi)
 
-savenii(swi, "<outputpath>/swi.nii"; header=mag.header)
-savenii(mip, "<outputpath>/mip.nii"; header=mag.header)
+SWI.savenii(swi, "<outputpath>/swi.nii"; header=mag.header)
+SWI.savenii(mip, "<outputpath>/mip.nii"; header=mag.header)
 ```
 
 ## License
