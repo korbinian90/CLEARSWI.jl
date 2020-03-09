@@ -16,7 +16,7 @@ mutable struct Options
     writesteps::Bool
 end
 
-function Options(;σ = [4, 4, 2], unwrapping = :laplacian, mode = :tanh, level = 5, combination_type = :SNR, sensitivity = nothing, writedir = nothing, writesteps = false)
+function Options(;σ=[4,4,0], unwrapping=:laplacian, mode=:tanh, level=4, combination_type=:SNR, sensitivity=nothing, writedir=nothing, writesteps=false)
     Options(σ, unwrapping, mode, level, combination_type, sensitivity, writedir, writesteps)
 end
 
