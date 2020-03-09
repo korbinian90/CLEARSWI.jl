@@ -77,7 +77,7 @@ function getcombinedphase(data, options, mask)
         @debug savenii(unwrapped, "unwrappedphase", options.writedir, data.header)
 
         for iEco in 1:size(phase, 4)
-            smoothed = gaussiansmooth3d(unwrapped[:,:,:,iEco], σ; mask=mask, dims=1:2)
+            smoothed = gaussiansmooth3d(unwrapped[:,:,:,iEco], σ; mask=mask, dims=1:3)
             unwrapped[:,:,:,iEco] .-= smoothed
         end
         combined = combine_echoes(unwrapped, mag, TEs)
