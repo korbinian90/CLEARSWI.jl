@@ -1,13 +1,20 @@
 
 module SWI
 
-using MRI, Statistics
+using MriResearchTools
+using Statistics
 
 include("tissue.jl")
 include("utility.jl")
 include("functions.jl")
 
-export calculateSWI, createMIP, saveconfiguration, Data, Options
+export calculateSWI,
+        createMIP,
+        saveconfiguration,
+        Data,
+        Options,
+        readmag,
+        readphase
 
 """
     SWI.dir(path...)
