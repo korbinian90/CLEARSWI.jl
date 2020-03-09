@@ -18,7 +18,7 @@ Open the REPL in Julia and type
 
 ```julia
 using Pkg
-Pkg.add(PackageSpec(url="https://github.com/korbinian90/MRI.jl"))
+Pkg.add(PackageSpec(url="https://github.com/korbinian90/MriResearchTools.jl"))
 Pkg.add(PackageSpec(url="https://github.com/korbinian90/SWI.jl"))
 ```
 
@@ -32,15 +32,15 @@ nifti_folder = SWI.dir("test","testData","small")
 magfile = joinpath(nifti_folder, "Mag.nii") # Path to the magnitude image in nifti format, must be .nii or .hdr
 phasefile = joinpath(nifti_folder, "Phase.nii") # Path to the phase image
 
-mag = SWI.readmag(magfile)
-phase = SWI.readphase(phasefile)
+mag = readmag(magfile)
+phase = readphase(phasefile)
 data = Data(mag, phase, mag.header, TEs)
 
-swi = SWI.calculateSWI(data)
-mip = SWI.createMIP(swi)
+swi = calculateSWI(data)
+mip = createMIP(swi)
 
-SWI.savenii(swi, "<outputpath>/swi.nii"; header=mag.header) # change <outputpath> with the path where you want to save the reconstructed SWI images
-SWI.savenii(mip, "<outputpath>/mip.nii"; header=mag.header)
+savenii(swi, "<outputpath>/swi.nii"; header=mag.header) # change <outputpath> with the path where you want to save the reconstructed SWI images
+savenii(mip, "<outputpath>/mip.nii"; header=mag.header)
 ```
 
 ## License

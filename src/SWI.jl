@@ -13,6 +13,7 @@ export calculateSWI,
         saveconfiguration,
         Data,
         Options,
+        savenii,
         readmag,
         readphase
 
