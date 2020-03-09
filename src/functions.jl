@@ -19,9 +19,11 @@ function getswimag(data, options)
     if sensitivity === nothing
         sensitivity = getsensitivity(data.mag[:,:,:,1], pixdim=getpixdim(data))
     end
-
     @debug savenii(sensitivity, "sensitivity", options.writedir, data.header)
-    combined_echoes ./ sensitivity
+
+    swimag = combined_echoes ./ sensitivity
+    @debug savenii(swimag, "swimag", options.writedir, data.header)
+    return swimag
 end
 
 function combine_echoes_swi(mag, TEs, type)
@@ -55,9 +57,11 @@ end
 function getswiphase(data, options)
     mask = getrobustmask(view(data.mag,:,:,:,1))
     @debug savenii(mask, "maskforphase", options.writedir, data.header)
-
+    # TODO output not readable
     combined = getcombinedphase(data, options, mask)
-    scaleandthreshold!(combined, mask, options.mode, options.level)
+    swiphase = scaleandthreshold!(combined, mask, options.mode, options.level)
+    @debug savenii(swiphase, "swiphase", options.writedir, data.header)
+    return swiphase
 end
 
 function getcombinedphase(data, options, mask)
