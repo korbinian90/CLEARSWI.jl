@@ -18,7 +18,6 @@ Open the REPL in Julia and type
 
 ```julia
 using Pkg
-Pkg.add(PackageSpec(url="https://github.com/korbinian90/MriResearchTools.jl"))
 Pkg.add(PackageSpec(url="https://github.com/korbinian90/SWI.jl"))
 ```
 
