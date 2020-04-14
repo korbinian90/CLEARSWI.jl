@@ -40,12 +40,7 @@ wrong_options = [
 
 s = []
 for o in options
-    try
-        @time push!(s, calculateSWI(data, o)[:,:,20])
-    catch
-        @show o
-        Base.invokelatest(Base.display_error, Base.catch_stack())
-    end
+    push!(s, calculateSWI(data, o)[:,:,20])
 end
 
 # all results should be different

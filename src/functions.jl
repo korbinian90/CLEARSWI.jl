@@ -170,24 +170,26 @@ function simulate_single_echo_mag(mag, TEs, TE_SE=mean(TEs))
 end
 
 function get_single_echo_weighting(TEs, TE_SE)
+    if TE_SE < TEs[1] || TE_SE > TEs[end]
+        error("Not possible to simulate TE=$TE_SE from $TEs !")
+    end
     weighting = ones(length(TEs))
     ΔTE = TEs[2] - TEs[1]
     echoend_ME = TEs[end] + ΔTE / 2
     echostart_ME = TEs[1] - ΔTE / 2
     echowidth_sim = 2min(echoend_ME - TE_SE, TE_SE - echostart_ME)
-    if echowidth_sim <= 0
-        error("Not possible to simulate $TE_SE from $TEs !")
-    end
+
     echostart_sim = TE_SE - echowidth_sim / 2
     echoend_sim = TE_SE + echowidth_sim / 2
 
     if echostart_sim > echostart_ME
-        lowechoborder = argmin(i->abs(TEs[i]-echostart_sim), 1:length(TEs))
+        lowechoborder = argmin(abs.(TEs .- echostart_sim))
         weighting[1:lowechoborder] .= 0
-        weighting[lowechoborder] = (TEs[lowechoborder] - echostart_sim) / ΔTE
-    elseif echoend_sim < echostart_ME
-        highechoborder = argmin(i->abs(TEs[i]-echoend_sim), 1:length(TEs))
+        weighting[lowechoborder] = (TEs[lowechoborder] + ΔTE/2 - echostart_sim) / ΔTE
+    elseif echoend_sim < echoend_ME
+        highechoborder = argmin(abs.(TEs .- echoend_sim))
         weighting[highechoborder:end] .= 0
-        weighting[highechoborder] = (TEs[highechoborder] - echoend_sim) / ΔTE
+        weighting[highechoborder] = (echoend_sim - (TEs[highechoborder] - ΔTE/2)) / ΔTE
     end
+    return weighting
 end
