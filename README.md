@@ -3,8 +3,11 @@
 [![Codecov](https://codecov.io/gh/korbinian90/SWI.jl/branch/master/graph/badge.svg)](https://codecov.io/gh/korbinian90/SWI.jl)
 [![Coveralls](https://coveralls.io/repos/github/korbinian90/SWI.jl/badge.svg?branch=master)](https://coveralls.io/github/korbinian90/SWI.jl?branch=master)
 
-# Susceptibility Weighted Imaging (SWI)
-SWI provides magnetic resonance images with improved vein and iron contrast by weighting the magnitude image with a preprocessed phase image. This package has the additional capability of multi-echo SWI, intensity correction and improved phase processing. It can also work with classical single-echo SWI.
+# Susceptibility Weighted Imaging (CLEAR SWI)
+Published at the [ISMRM as CLEAR SWI](https://index.mirasmart.com/ISMRM2020/PDFfiles/3201.html). It provides magnetic resonance images with improved vein and iron contrast by weighting the magnitude image with a preprocessed phase image. This package has the additional capability of multi-echo SWI, intensity correction and improved phase processing. It can also work with classical single-echo SWI.
+
+# Caution
+This package is out of date and will be updated in September 2020.
 
 ## Getting Started
 
