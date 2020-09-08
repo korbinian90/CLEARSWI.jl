@@ -17,7 +17,7 @@ function getswimag(data, options)
 
     sensitivity = options.sensitivity
     if sensitivity === nothing
-        sensitivity = getsensitivity(data.mag[:,:,:,1], pixdim=getpixdim(data))
+        sensitivity = getsensitivity(data.mag[:,:,:,1], getpixdim(data))
     end
     @debug savenii(sensitivity, "sensitivity", options.writedir, data.header)
 
@@ -30,16 +30,21 @@ function combine_echoes_swi(mag, TEs, type)
     T2s, factor = gettissue_easy(:B7T)
 
     if ndims(mag) == 3 # only one echo
-        copy(mag)
+        return copy(mag)
     elseif type == :SNR
-        RSS(mag)
+        return RSS(mag)
+    elseif type == :SE
+        return simulate_single_echo_mag(mag, TEs)
     elseif typeof(type) <: Pair
-        type, (w1, w2) = type
+        type, para = type
         if type == :CNR
+            (w1, w2) = para
             S(TE, tissue) = factor[tissue] * exp(-TE / T2s[tissue])
             w(TE, w1, w2) = S(TE, w1) - S(TE, w2)
-
-            combine_weighted(mag, w.(TEs, w1, w2))
+            return combine_weighted(mag, w.(TEs, w1, w2))
+        elseif type == :SE
+            TE_SE = para
+            return simulate_single_echo_mag(mag, TEs, TE_SE)
         end
     else
         throw("ERROR: $type not defined for combination of echoes!")
@@ -55,7 +60,7 @@ function combine_weighted(mag, w)
 end
 
 function getswiphase(data, options)
-    mask = getrobustmask(view(data.mag,:,:,:,1))
+    mask = robustmask(view(data.mag,:,:,:,1))
     @debug savenii(mask, "maskforphase", options.writedir, data.header)
     # TODO output not readable
     combined = getcombinedphase(data, options, mask)
@@ -72,7 +77,6 @@ function getcombinedphase(data, options, mask)
 
     # reshape TEs to the highest dimension, eg. "size(TEs) = (1, 1, 1, 3)"
     TEs = reshape(TEs, 1, 1, 1, length(TEs))
-    @show typeof(phase)
     unwrapped = similar(phase)
     if options.unwrapping == :laplacian
         for iEco in 1:size(phase, 4)
@@ -88,7 +92,7 @@ function getcombinedphase(data, options, mask)
         @debug savenii(unwrapped, "filteredphase", options.writedir, data.header)
         @debug savenii(combined, "combinedphase", options.writedir, data.header)
 
-    elseif unwrapping == :laplacianslice
+    elseif options.unwrapping == :laplacianslice
         for iEco in 1:size(phase, 4), iSlc in 1:size(phase, 3)
             unwrapped[:,:,iSlc,iEco] .= laplacianunwrap(view(phase,:,:,iSlc,iEco))
             smoothed = gaussiansmooth3d(unwrapped[:,:,iSlc,iEco], σ; mask=mask[:,:,iSlc], dims=1:2)
@@ -98,8 +102,8 @@ function getcombinedphase(data, options, mask)
         @debug savenii(unwrapped, "unwrapped", options.writedir, data.header)
         @debug savenii(combined, "combinedphase", options.writedir, data.header)
 
-    elseif unwrapping == :romeo
-        unwrapped = kunwrap(phase, mag; TEs = TEs)#, mask = mask)
+    elseif options.unwrapping == :romeo
+        unwrapped = romeo(phase, mag=mag, TEs=TEs)#, mask = mask)
         @debug savenii(unwrapped, "unwrappedphase", options.writedir, data.header)
 
         combined = combine_echoes(unwrapped, mag, TEs)
@@ -109,7 +113,7 @@ function getcombinedphase(data, options, mask)
         @debug savenii(combined, "filteredphase", options.writedir, data.header)
 
     else
-        error("Unwrapping $unwrapping not defined!")
+        error("Unwrapping $unwrapping ($(typeof(unwrapping))) not defined!")
     end
 
     combined
@@ -158,3 +162,34 @@ function createMIP(S, d=7)
     [minimum(S[x,y,z:z+d-1]) for x in 1:size(S,1), y in 1:size(S,2), z in 1:size(S,3)-d+1]
 end
 getpixdim(data) = data.header.pixdim[2:(1+ndims(data.mag))]
+
+function simulate_single_echo_mag(mag, TEs, TE_SE=mean(TEs))
+    weighting = get_single_echo_weighting(TEs, TE_SE)
+    weighting = to_dim(weighting, 4)
+    return sum(mag .* weighting; dims=4)
+end
+
+function get_single_echo_weighting(TEs, TE_SE)
+    if TE_SE < TEs[1] || TE_SE > TEs[end]
+        error("Not possible to simulate TE=$TE_SE from $TEs !")
+    end
+    weighting = ones(length(TEs))
+    ΔTE = TEs[2] - TEs[1]
+    echoend_ME = TEs[end] + ΔTE / 2
+    echostart_ME = TEs[1] - ΔTE / 2
+    echowidth_sim = 2min(echoend_ME - TE_SE, TE_SE - echostart_ME)
+
+    echostart_sim = TE_SE - echowidth_sim / 2
+    echoend_sim = TE_SE + echowidth_sim / 2
+
+    if echostart_sim > echostart_ME
+        lowechoborder = argmin(abs.(TEs .- echostart_sim))
+        weighting[1:lowechoborder] .= 0
+        weighting[lowechoborder] = (TEs[lowechoborder] + ΔTE/2 - echostart_sim) / ΔTE
+    elseif echoend_sim < echoend_ME
+        highechoborder = argmin(abs.(TEs .- echoend_sim))
+        weighting[highechoborder:end] .= 0
+        weighting[highechoborder] = (echoend_sim - (TEs[highechoborder] - ΔTE/2)) / ΔTE
+    end
+    return weighting
+end

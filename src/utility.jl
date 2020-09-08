@@ -10,7 +10,7 @@ mutable struct Options
     unwrapping::Symbol
     mode::Symbol
     level::Number
-    combination_type::Union{Symbol, Pair{Symbol,Tuple{Symbol,Symbol}}}
+    combination_type::Union{Symbol, Pair{Symbol,<:Number}, Pair{Symbol,Tuple{Symbol,Symbol}}}
     sensitivity::Union{AbstractArray, Nothing}
     writedir::Union{AbstractString, Nothing}
     writesteps::Bool

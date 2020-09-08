@@ -1,6 +1,3 @@
-using Test
-import SWI: Options, saveconfiguration
-
 σ = [2,2,1]
 unwrapping = :laplacian
 mode = :linear
