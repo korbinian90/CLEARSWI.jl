@@ -17,7 +17,7 @@ function getswimag(data, options)
 
     sensitivity = options.sensitivity
     if sensitivity === nothing
-        sensitivity = getsensitivity(data.mag[:,:,:,1], pixdim=getpixdim(data))
+        sensitivity = getsensitivity(data.mag[:,:,:,1], getpixdim(data))
     end
     @debug savenii(sensitivity, "sensitivity", options.writedir, data.header)
 
