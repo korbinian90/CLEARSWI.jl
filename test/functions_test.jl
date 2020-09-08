@@ -1,6 +1,3 @@
-using Test
-using SWI
-
 data_path = "testData/small"
 TEs = [4,8,12]
 

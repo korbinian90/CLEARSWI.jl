@@ -1,4 +1,4 @@
-using SWI
+using CLEARSWI
 using Test
 
 @time begin

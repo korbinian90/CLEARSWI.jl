@@ -1,5 +1,5 @@
 
-module SWI
+module CLEARSWI
 
 using MriResearchTools
 using Statistics
@@ -18,12 +18,12 @@ export calculateSWI,
         readphase
 
 """
-    SWI.dir(path...)
+    CLEARSWI.dir(path...)
 Construct a path relative to SWI root.
 # Example
 ```julia
-julia> SWI.dir("test","testData","small","Mag.nii")
-"/home/korbinian90/.julia/dev/SWI/test/testData/small/Mag.nii"
+julia> CLEARSWI.dir("test","testData","small","Mag.nii")
+"/home/korbinian90/.julia/dev/CLEARSWI/test/testData/small/Mag.nii"
 ```
 """
 dir(path...) = joinpath(dirname(@__DIR__),path...)
