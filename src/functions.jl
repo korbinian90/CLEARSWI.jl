@@ -27,21 +27,20 @@ function getswimag(data, options)
 end
 
 function combine_echoes_swi(mag, TEs, type)
-    T2s, factor = gettissue_easy(:B7T)
-
     if ndims(mag) == 3 # only one echo
         return copy(mag)
     elseif type == :SNR
         return RSS(mag)
     elseif type == :SE
         return simulate_single_echo_mag(mag, TEs)
+    elseif type == :average
+        return sum(mag; dims=4)
     elseif typeof(type) <: Pair
         type, para = type
         if type == :CNR
             (w1, w2) = para
-            S(TE, tissue) = factor[tissue] * exp(-TE / T2s[tissue])
-            w(TE, w1, w2) = S(TE, w1) - S(TE, w2)
-            return combine_weighted(mag, w.(TEs, w1, w2))
+            weighting = calculate_cnr_weighting(TEs, w1, w2)
+            return combine_weighted(mag, weighting)
         elseif type == :SE
             TE_SE = para
             return simulate_single_echo_mag(mag, TEs, TE_SE)
@@ -49,6 +48,13 @@ function combine_echoes_swi(mag, TEs, type)
     else
         throw("ERROR: $type not defined for combination of echoes!")
     end
+end
+
+function calculate_cnr_weighting(TEs, w1, w2; field=:B7T)
+    T2s, factor = gettissue_easy(field)
+    S(TE, tissue) = factor[tissue] * exp(-TE / T2s[tissue])
+    w(TE, w1, w2) = S(TE, w1) - S(TE, w2)
+    return w.(TEs, w1, w2)
 end
 
 function combine_weighted(mag, w)
@@ -72,11 +78,9 @@ end
 function getcombinedphase(data, options, mask)
     phase = data.phase
     mag = data.mag
-    TEs = data.TEs
+    TEs = to_dim(data.TEs, 4)
     σ = options.σ
 
-    # reshape TEs to the highest dimension, eg. "size(TEs) = (1, 1, 1, 3)"
-    TEs = reshape(TEs, 1, 1, 1, length(TEs))
     unwrapped = similar(phase)
     if options.unwrapping == :laplacian
         for iEco in 1:size(phase, 4)
@@ -173,7 +177,6 @@ function get_single_echo_weighting(TEs, TE_SE)
     if TE_SE < TEs[1] || TE_SE > TEs[end]
         error("Not possible to simulate TE=$TE_SE from $TEs !")
     end
-    weighting = ones(length(TEs))
     ΔTE = TEs[2] - TEs[1]
     echoend_ME = TEs[end] + ΔTE / 2
     echostart_ME = TEs[1] - ΔTE / 2
@@ -182,6 +185,17 @@ function get_single_echo_weighting(TEs, TE_SE)
     echostart_sim = TE_SE - echowidth_sim / 2
     echoend_sim = TE_SE + echowidth_sim / 2
 
+    return get_single_echo_weighting(TEs, echostart_sim, echoend_sim)
+end
+
+function get_single_echo_weighting(TEs, echostart_sim, echoend_sim)
+    ΔTE = TEs[2] - TEs[1]
+    echoend_ME = TEs[end] + ΔTE / 2
+    echostart_ME = TEs[1] - ΔTE / 2
+    if echostart_sim < echostart_ME || echoend_sim > echoend_ME || echoend_sim - echostart_sim < ΔTE
+        error("Not possible to simulate [$(echostart_sim);$(echoend_sim)] from $TEs !")
+    end
+    weighting = ones(length(TEs))
     if echostart_sim > echostart_ME
         lowechoborder = argmin(abs.(TEs .- echostart_sim))
         weighting[1:lowechoborder] .= 0
