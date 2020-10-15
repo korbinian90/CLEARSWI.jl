@@ -6,9 +6,6 @@
 # Susceptibility Weighted Imaging (CLEAR SWI)
 Published at the [ISMRM as CLEAR SWI](https://index.mirasmart.com/ISMRM2020/PDFfiles/3201.html). It provides magnetic resonance images with improved vein and iron contrast by weighting the magnitude image with a preprocessed phase image. This package has the additional capability of multi-echo SWI, intensity correction and improved phase processing. It can also work with classical single-echo SWI.
 
-# Caution
-This package is out of date and will be updated in September 2020.
-
 ## Getting Started
 
 ### Prerequisites
