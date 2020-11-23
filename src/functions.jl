@@ -125,12 +125,12 @@ end
 
 combine_echoes(unwrapped::AbstractArray{T,3}, mag, TEs) where T = copy(unwrapped) # one echo
 function combine_echoes(unwrapped::AbstractArray{T,4}, mag, TEs) where T
-    dim = 4
-    TEs = reshape(TEs, ones(Int, dim-1)..., length(TEs)) # size = (1,1,1,nEco)
+    dims = 4
+    TEs = reshape(TEs, ones(Int, dims-1)..., length(TEs)) # size = (1,1,1,nEco)
 
-    combined = sum(unwrapped .* mag; dims=dim)
-    combined ./= sum(mag .* Float32.(TEs); dims=dim)
-    dropdims(combined; dims=dim)
+    combined = sum(unwrapped .* TEs .* mag .* mag; dims=dims)
+    combined ./= sum(mag .* mag .* float.(TEs).^2; dims=dims)
+    dropdims(combined; dims=dims)
 end
 
 function scaleandthreshold!(swiphase, mask, mode, level)
