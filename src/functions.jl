@@ -5,10 +5,11 @@
 Returns the calculated SWI using 'data' and 'options'.
 """
 function calculateSWI(data, options=Options())
+    @show options
     if !options.writesteps
         options.writedir = nothing
     end
-    getswimag(data, options) .* getswiphase(data, options)
+    (@time getswimag(data, options)) .* (@time getswiphase(data, options))
 end
 
 function getswimag(data, options)
@@ -44,6 +45,9 @@ function combine_echoes_swi(mag, TEs, type)
         elseif type == :SE
             TE_SE = para
             return simulate_single_echo_mag(mag, TEs, TE_SE)
+        elseif type == :exp
+            @show weighting = (1:length(TEs)) .^ para
+            return combine_weighted(mag, weighting)
         end
     else
         throw("ERROR: $type not defined for combination of echoes!")
@@ -82,21 +86,36 @@ function getcombinedphase(data, options, mask)
     σ = options.σ
 
     unwrapped = similar(phase)
+    @show options.unwrapping
     if options.unwrapping == :laplacian
-        for iEco in 1:size(phase, 4)
+        @show "lapl"
+        @time for iEco in 1:size(phase, 4)
             unwrapped[:,:,:,iEco] .= laplacianunwrap(view(phase,:,:,:,iEco))
         end
         @debug savenii(unwrapped, "unwrappedphase", options.writedir, data.header)
 
-        for iEco in 1:size(phase, 4)
+        @time for iEco in 1:size(phase, 4)
             smoothed = gaussiansmooth3d(unwrapped[:,:,:,iEco], σ; mask=mask, dims=1:3)
             unwrapped[:,:,:,iEco] .-= smoothed
         end
         combined = combine_echoes(unwrapped, mag, TEs)
         @debug savenii(unwrapped, "filteredphase", options.writedir, data.header)
         @debug savenii(combined, "combinedphase", options.writedir, data.header)
-
+    elseif options.unwrapping == :laplacian_noise
+            @show "lapl"
+            @time for iEco in 1:size(phase, 4)
+                unwrapped[:,:,:,iEco] .= laplacianunwrap(view(phase,:,:,:,iEco))
+            end
+            @debug savenii(unwrapped, "unwrappedphase", options.writedir, data.header)
+    
+            combined = combine_echoes(unwrapped, mag, TEs)
+            @debug savenii(combined, "combinedphase", options.writedir, data.header)
+    
+            combined .-= gaussiansmooth3d(combined, σ; mask = mask, dims = 1:2)
+            @debug savenii(combined, "filteredphase", options.writedir, data.header)
+    
     elseif options.unwrapping == :laplacianslice
+        @show "laplslice"
         for iEco in 1:size(phase, 4), iSlc in 1:size(phase, 3)
             unwrapped[:,:,iSlc,iEco] .= laplacianunwrap(view(phase,:,:,iSlc,iEco))
             smoothed = gaussiansmooth3d(unwrapped[:,:,iSlc,iEco], σ; mask=mask[:,:,iSlc], dims=1:2)
@@ -107,6 +126,7 @@ function getcombinedphase(data, options, mask)
         @debug savenii(combined, "combinedphase", options.writedir, data.header)
 
     elseif options.unwrapping == :romeo
+        @show "romeo"
         unwrapped = romeo(phase, mag=mag, TEs=TEs)#, mask = mask)
         @debug savenii(unwrapped, "unwrappedphase", options.writedir, data.header)
 

@@ -1,12 +1,16 @@
-
 module CLEARSWI
 
 using MriResearchTools
 using Statistics
+using ImageFiltering
+using LsqFit
+using DSP
 
 include("tissue.jl")
 include("utility.jl")
 include("functions.jl")
+include("GEPCI.jl")
+include("QuinnSWI.jl")
 
 export calculateSWI,
         createMIP,
@@ -15,7 +19,8 @@ export calculateSWI,
         Options,
         savenii,
         readmag,
-        readphase
+        readphase,
+        GEPCI, quinn
 
 """
     CLEARSWI.dir(path...)
