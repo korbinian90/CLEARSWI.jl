@@ -43,6 +43,8 @@ function combine_echoes_swi(mag, TEs, type)
         return simulate_single_echo_mag(mag, TEs)
     elseif type == :average
         return sum(mag; dims=4)
+    elseif type == :last
+        return mag[:,:,:,end]
     elseif typeof(type) <: Pair
         type, para = type
         if type == :CNR
@@ -52,9 +54,12 @@ function combine_echoes_swi(mag, TEs, type)
         elseif type == :SE
             TE_SE = para
             return simulate_single_echo_mag(mag, TEs, TE_SE)
-        elseif type == :exp
-            @show weighting = (1:length(TEs)) .^ para
-            return combine_weighted(mag, weighting)
+        elseif type == :closest
+            TE_SE = para
+            eco = findmin(abs.(TEs .- TE_SE))[2]
+            return mag[:,:,:,eco]
+        elseif type == :echo
+            return mag[:,:,:,para]
         end
     else
         throw("ERROR: $type not defined for combination of echoes!")
