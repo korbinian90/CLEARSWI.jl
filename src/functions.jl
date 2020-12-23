@@ -13,17 +13,24 @@ function calculateSWI(data, options=Options())
 end
 
 function getswimag(data, options)
+    if options.combination_type == :GEPCI
+        GEPCI(data, options)
+        return
+    elseif options.combination_type == :quinnSWI
+        quinnSWI(data, options)
+        return
+    end
     combined_echoes = combine_echoes_swi(data.mag, data.TEs, options.combination_type)
-    @debug savenii(combined_echoes, "combined_mag", options.writedir, data.header)
+    options.writesteps && savenii(combined_echoes, "combined_mag", options.writedir, data.header)
 
     sensitivity = options.sensitivity
     if sensitivity === nothing
         sensitivity = getsensitivity(data.mag[:,:,:,1], getpixdim(data))
     end
-    @debug savenii(sensitivity, "sensitivity", options.writedir, data.header)
+    options.writesteps && savenii(sensitivity, "sensitivity", options.writedir, data.header)
 
     swimag = combined_echoes ./ sensitivity
-    @debug savenii(swimag, "swimag", options.writedir, data.header)
+    options.writesteps && savenii(swimag, "swimag", options.writedir, data.header)
     return swimag
 end
 
@@ -71,11 +78,11 @@ end
 
 function getswiphase(data, options)
     mask = robustmask(view(data.mag,:,:,:,1))
-    @debug savenii(mask, "maskforphase", options.writedir, data.header)
+    options.writesteps && savenii(mask, "maskforphase", options.writedir, data.header)
     # TODO output not readable
     combined = getcombinedphase(data, options, mask)
-    swiphase = scaleandthreshold!(combined, mask, options.mode, options.level)
-    @debug savenii(swiphase, "swiphase", options.writedir, data.header)
+    swiphase = scaleandthreshold!(combined, mask, options.mode, options.level, data.TEs)
+    options.writesteps && savenii(swiphase, "swiphase", options.writedir, data.header)
     return swiphase
 end
 
@@ -92,27 +99,27 @@ function getcombinedphase(data, options, mask)
         @time for iEco in 1:size(phase, 4)
             unwrapped[:,:,:,iEco] .= laplacianunwrap(view(phase,:,:,:,iEco))
         end
-        @debug savenii(unwrapped, "unwrappedphase", options.writedir, data.header)
+        options.writesteps && savenii(unwrapped, "unwrappedphase", options.writedir, data.header)
 
         @time for iEco in 1:size(phase, 4)
             smoothed = gaussiansmooth3d(unwrapped[:,:,:,iEco], σ; mask=mask, dims=1:3)
             unwrapped[:,:,:,iEco] .-= smoothed
         end
         combined = combine_echoes(unwrapped, mag, TEs)
-        @debug savenii(unwrapped, "filteredphase", options.writedir, data.header)
-        @debug savenii(combined, "combinedphase", options.writedir, data.header)
+        options.writesteps && savenii(unwrapped, "filteredphase", options.writedir, data.header)
+        options.writesteps && savenii(combined, "combinedphase", options.writedir, data.header)
     elseif options.unwrapping == :laplacian_noise
             @show "lapl"
             @time for iEco in 1:size(phase, 4)
                 unwrapped[:,:,:,iEco] .= laplacianunwrap(view(phase,:,:,:,iEco))
             end
-            @debug savenii(unwrapped, "unwrappedphase", options.writedir, data.header)
+            options.writesteps && savenii(unwrapped, "unwrappedphase", options.writedir, data.header)
     
             combined = combine_echoes(unwrapped, mag, TEs)
-            @debug savenii(combined, "combinedphase", options.writedir, data.header)
+            options.writesteps && savenii(combined, "combinedphase", options.writedir, data.header)
     
             combined .-= gaussiansmooth3d(combined, σ; mask = mask, dims = 1:2)
-            @debug savenii(combined, "filteredphase", options.writedir, data.header)
+            options.writesteps && savenii(combined, "filteredphase", options.writedir, data.header)
     
     elseif options.unwrapping == :laplacianslice
         @show "laplslice"
@@ -122,19 +129,19 @@ function getcombinedphase(data, options, mask)
             unwrapped[:,:,iSlc,iEco] .-= smoothed
         end
         combined = combine_echoes(unwrapped, mag, TEs)
-        @debug savenii(unwrapped, "unwrapped", options.writedir, data.header)
-        @debug savenii(combined, "combinedphase", options.writedir, data.header)
+        options.writesteps && savenii(unwrapped, "unwrapped", options.writedir, data.header)
+        options.writesteps && savenii(combined, "combinedphase", options.writedir, data.header)
 
     elseif options.unwrapping == :romeo
         @show "romeo"
         unwrapped = romeo(phase, mag=mag, TEs=TEs)#, mask = mask)
-        @debug savenii(unwrapped, "unwrappedphase", options.writedir, data.header)
+        options.writesteps && savenii(unwrapped, "unwrappedphase", options.writedir, data.header)
 
         combined = combine_echoes(unwrapped, mag, TEs)
-        @debug savenii(combined, "combinedphase", options.writedir, data.header)
+        options.writesteps && savenii(combined, "combinedphase", options.writedir, data.header)
 
         combined .-= gaussiansmooth3d(combined, σ; mask = mask, dims = 1:2)
-        @debug savenii(combined, "filteredphase", options.writedir, data.header)
+        options.writesteps && savenii(combined, "filteredphase", options.writedir, data.header)
 
     else
         error("Unwrapping $unwrapping ($(typeof(unwrapping))) not defined!")
@@ -153,7 +160,7 @@ function combine_echoes(unwrapped::AbstractArray{T,4}, mag, TEs) where T
     dropdims(combined; dims=dims)
 end
 
-function scaleandthreshold!(swiphase, mask, mode, level)
+function scaleandthreshold!(swiphase, mask, mode, level, TEs)
     swiphase[.!mask] .= 0
     pos = swiphase .> 0
 
@@ -174,6 +181,11 @@ function scaleandthreshold!(swiphase, mask, mode, level)
     elseif mode == :triangular
         swiphase[pos] .= robustrescale(swiphase[pos], 1, 0) .^ level
         swiphase[.!pos] .= robustrescale(swiphase[.!pos], 0, 1) .^ level
+
+    elseif mode == :quinn
+        X = 3estimatequantile(swiphase, 0.95)
+        H(x) = if x>X 0 elseif x<0 1 else 1/2 * (1 + cos(π*x/X)) end
+        swiphase .= H.(swiphase) .^ level
 
     else
         error("$mode not defined for SWI")
@@ -210,9 +222,13 @@ end
 
 function get_single_echo_weighting(TEs, echostart_sim, echoend_sim)
     ΔTE = TEs[2] - TEs[1]
-    echoend_ME = TEs[end] + ΔTE / 2
-    echostart_ME = TEs[1] - ΔTE / 2
-    if echostart_sim < echostart_ME || echoend_sim > echoend_ME || echoend_sim - echostart_sim < ΔTE
+    @show echoend_ME = TEs[end] + ΔTE / 2
+    @show echostart_ME = TEs[1] - ΔTE / 2
+    @show (echoend_sim - 1e-5)
+    @show (echoend_sim - 1e-5) > echoend_ME
+    @show (echostart_sim - 1e-5) > echostart_ME
+    @show (echoend_sim - echostart_sim + 1e-5) < ΔTE
+    if (echostart_sim + 1e-5) < echostart_ME || (echoend_sim - 1e-5) > echoend_ME || (echoend_sim - echostart_sim + 1e-5) < ΔTE
         error("Not possible to simulate [$(echostart_sim);$(echoend_sim)] from $TEs !")
     end
     weighting = ones(length(TEs))

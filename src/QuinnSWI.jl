@@ -1,22 +1,24 @@
 using DSP, ImageFiltering, MriResearchTools
-function quinn(mag, phase, TEs; m=4, f=1, pth=raw"I:\Korbi\test\quinn")
-    mkpath(pth)
-    mag = readmag(mag)
-    phase = readphase(phase)
-    phase = float.(phase)
-    savenii(phase[:,:,:,3], "ph3", pth)
+quinnSWI(data, options::Options) = quinnSWI(data; m=options.level, writedir=options.writedir, writesteps=options.writesteps)
+quinnSWI(data, options) = quinnSWI(data; options...)
+function quinnSWI(data; m=4, f=7/3, writedir=raw"I:\Korbi\test\quinn", writesteps=false)
+    TEs = data.TEs
+    hdr = data.header
+    mag = data.mag
+    phase = data.phase
+    writesteps && savenii(phase[:,:,:,3], "ph3", writedir, hdr)
     @time quinn_homodyne!(phase, mag, f)
-    savenii(phase[:,:,:,3], "homodyne3", pth)
+    writesteps && savenii(phase[:,:,:,3], "homodyne3", writedir, hdr)
     @time quinn_temporal_unwrap!(phase)
-    savenii(phase[:,:,:,3], "unwrapped", pth)
+    writesteps && savenii(phase[:,:,:,3], "unwrapped", writedir, hdr)
     @time f = MriResearchTools.calculateB0_unwrapped(phase, mag, TEs)
-    savenii(f, "f", pth)
+    writesteps && savenii(f, "f", writedir, hdr)
     pmask = calculate_pmask(f, TEs, :lin)
-    savenii(pmask, "pmask", pth)
+    writesteps && savenii(pmask, "pmask", writedir, hdr)
     avmag = mean(mag; dims=4)
-    savenii(avmag, "avmag", pth)
+    savenii(avmag, "swimag", writedir, hdr)
     swi = avmag .* pmask.^m
-    savenii(swi, "swi", pth)
+    writesteps && savenii(swi, "swi", writedir, hdr)
     return swi
 end
 

@@ -20,7 +20,7 @@ export calculateSWI,
         savenii,
         readmag,
         readphase,
-        GEPCI, quinn
+        GEPCI, quinnSWI
 
 """
     CLEARSWI.dir(path...)
