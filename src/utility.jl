@@ -14,10 +14,11 @@ mutable struct Options
     sensitivity::Union{AbstractArray, Nothing}
     writedir::Union{AbstractString, Nothing}
     writesteps::Bool
+    magscale
 end
 
-function Options(;σ=[4,4,0], unwrapping=:laplacian, mode=:tanh, level=4, combination_type=:SNR, sensitivity=nothing, writedir=nothing, writesteps=false)
-    Options(σ, unwrapping, mode, level, combination_type, sensitivity, writedir, writesteps)
+function Options(;σ=[4,4,0], unwrapping=:laplacian, mode=:tanh, level=4, combination_type=:SNR, sensitivity=nothing, writedir=nothing, writesteps=false, magscale=identity)
+    Options(σ, unwrapping, mode, level, combination_type, sensitivity, writedir, writesteps, magscale)
 end
 
 Base.string(t::Pair{Symbol,Tuple{Symbol,Symbol}}) = "$(t[1])_$(t[2][1])_$(t[2][2])"

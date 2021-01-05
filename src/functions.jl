@@ -29,9 +29,15 @@ function getswimag(data, options)
     end
     options.writesteps && savenii(sensitivity, "sensitivity", options.writedir, data.header)
 
-    swimag = combined_echoes ./ sensitivity
+    swimag = options.magscale(combined_echoes ./ sensitivity)
     options.writesteps && savenii(swimag, "swimag", options.writedir, data.header)
     return swimag
+end
+
+function softplus(val, offset, factor=1)
+    f = factor / offset
+    sp(x) = log(1 + exp(f * (x - offset))) / f
+    return sp(val) - sp(0)
 end
 
 function combine_echoes_swi(mag, TEs, type)
@@ -61,9 +67,8 @@ function combine_echoes_swi(mag, TEs, type)
         elseif type == :echo
             return mag[:,:,:,para]
         end
-    else
-        throw("ERROR: $type not defined for combination of echoes!")
     end
+    throw("ERROR: $type not defined for combination of echoes!")
 end
 
 function calculate_cnr_weighting(TEs, w1, w2; field=:B7T)
