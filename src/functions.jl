@@ -5,7 +5,6 @@
 Returns the calculated SWI using 'data' and 'options'.
 """
 function calculateSWI(data, options=Options())
-    @show options
     if !options.writesteps
         options.writedir = nothing
     end
@@ -103,9 +102,7 @@ function getcombinedphase(data, options, mask)
     σ = options.σ
 
     unwrapped = similar(phase)
-    @show options.unwrapping
     if options.unwrapping == :laplacian
-        @show "lapl"
         @time for iEco in 1:size(phase, 4)
             unwrapped[:,:,:,iEco] .= laplacianunwrap(view(phase,:,:,:,iEco))
         end
@@ -119,7 +116,6 @@ function getcombinedphase(data, options, mask)
         options.writesteps && savenii(unwrapped, "filteredphase", options.writedir, data.header)
         options.writesteps && savenii(combined, "combinedphase", options.writedir, data.header)
     elseif options.unwrapping == :laplacian_noise
-            @show "lapl"
             @time for iEco in 1:size(phase, 4)
                 unwrapped[:,:,:,iEco] .= laplacianunwrap(view(phase,:,:,:,iEco))
             end
@@ -132,7 +128,6 @@ function getcombinedphase(data, options, mask)
             options.writesteps && savenii(combined, "filteredphase", options.writedir, data.header)
     
     elseif options.unwrapping == :laplacianslice
-        @show "laplslice"
         for iEco in 1:size(phase, 4), iSlc in 1:size(phase, 3)
             unwrapped[:,:,iSlc,iEco] .= laplacianunwrap(view(phase,:,:,iSlc,iEco))
             smoothed = gaussiansmooth3d(unwrapped[:,:,iSlc,iEco], σ; mask=mask[:,:,iSlc], dims=1:2)
@@ -143,7 +138,6 @@ function getcombinedphase(data, options, mask)
         options.writesteps && savenii(combined, "combinedphase", options.writedir, data.header)
 
     elseif options.unwrapping == :romeo
-        @show "romeo"
         unwrapped = romeo(phase, mag=mag, TEs=TEs)#, mask = mask)
         options.writesteps && savenii(unwrapped, "unwrappedphase", options.writedir, data.header)
 
@@ -212,7 +206,7 @@ getpixdim(data) = data.header.pixdim[2:(1+ndims(data.mag))]
 function simulate_single_echo_mag(mag, TEs, TE_SE=mean(TEs))
     weighting = get_single_echo_weighting(TEs, TE_SE)
     weighting = to_dim(weighting, 4)
-    return sum(mag .* weighting; dims=4)
+    return dropdims(sum(mag .* weighting; dims=4); dims=4)
 end
 
 function get_single_echo_weighting(TEs, TE_SE)
@@ -232,12 +226,6 @@ end
 
 function get_single_echo_weighting(TEs, echostart_sim, echoend_sim)
     ΔTE = TEs[2] - TEs[1]
-    @show echoend_ME = TEs[end] + ΔTE / 2
-    @show echostart_ME = TEs[1] - ΔTE / 2
-    @show (echoend_sim - 1e-5)
-    @show (echoend_sim - 1e-5) > echoend_ME
-    @show (echostart_sim - 1e-5) > echostart_ME
-    @show (echoend_sim - echostart_sim + 1e-5) < ΔTE
     if (echostart_sim + 1e-5) < echostart_ME || (echoend_sim - 1e-5) > echoend_ME || (echoend_sim - echostart_sim + 1e-5) < ΔTE
         error("Not possible to simulate [$(echostart_sim);$(echoend_sim)] from $TEs !")
     end
