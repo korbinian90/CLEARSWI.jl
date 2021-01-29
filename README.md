@@ -25,17 +25,17 @@ This is a simple multi-echo case without changing default behavior
 using CLEARSWI
 
 TEs = [4,8,12] # change this to the Echo Time of your sequence. For multi-echoes, set a list of TE values, else set a list with a single TE value.
-nifti_folder = SWI.dir("test","testData","small")
+nifti_folder = CLEARSWI.dir("test","testData","small")
 magfile = joinpath(nifti_folder, "Mag.nii") # Path to the magnitude image in nifti format, must be .nii or .hdr
 phasefile = joinpath(nifti_folder, "Phase.nii") # Path to the phase image
 
-mag = readmag(magfile)
-phase = readphase(phasefile)
-data = Data(mag, phase, mag.header, TEs)
+mag = readmag(magfile);
+phase = readphase(phasefile);
+data = Data(mag, phase, mag.header, TEs);
 
 options = Options() # default CLEAR-SWI
-swi = calculateSWI(data, options)
-mip = createMIP(swi)
+swi = calculateSWI(data, options);
+mip = createMIP(swi);
 
 savenii(swi, "<outputpath>/swi.nii"; header=mag.header) # change <outputpath> with the path where you want to save the reconstructed SWI
 savenii(mip, "<outputpath>/mip.nii"; header=mag.header)
