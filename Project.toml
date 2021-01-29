@@ -1,7 +1,7 @@
 name = "CLEARSWI"
 uuid = "06ae4d9b-ce5e-4813-a1b3-426e46312ec2"
 authors = ["Korbinian Eckstein"]
-version = "0.2.0"
+version = "0.2.1"
 
 [deps]
 DSP = "717857b8-e6f2-59f4-9121-6e50c889abd2"
