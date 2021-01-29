@@ -46,6 +46,7 @@ function GEPCI(data::Data; m=4, writedir=raw"I:\Korbi\GEPCI\calc", overwrite=fal
     return swi_like
 end
 
+## Utility methods for slicewise fitting
 function getfns(writedir)
     return joinpath.(writedir, ["S0", "r2s", "f"] .* ".nii")
 end
@@ -56,23 +57,6 @@ function init(data::Data, writedir)
             write_emptynii(size(data.mag)[1:3], fn; header=data.header)
         end
     end
-end
-
-function init(fnmag, writedir)
-    for fn in getfns(writedir)
-        if !isfile(fn)
-            ref = niread(fnmag; mmap=true)
-            write_emptynii(size(ref)[1:3], fn; header=ref.header)
-        end
-    end
-end
-
-function getmask(mag)
-    mask = robustmask(view(mag,:,:,:,1))
-    filtersize = (5,5,3)
-    kernel = centered(ones(filtersize))
-    kernel ./= sum(kernel)
-    return imfilter(mask, kernel) .> 0.5
 end
 
 function is_slice_finished(writedir, islice)
@@ -90,6 +74,16 @@ function load_fit(writedir)
     return (niread(fn).raw for fn in getfns(writedir))
 end
 
+## GEPCI steps
+function getmask(mag)
+    mask = robustmask(view(mag,:,:,:,1))
+    filtersize = (5,5,3)
+    kernel = centered(ones(filtersize))
+    kernel ./= sum(kernel)
+    return imfilter(mask, kernel) .> 0.5
+end
+
+# acquisition was ASPIRE, the results of the simulated coil comb are identical in SNR to the original GEPCI coil combination
 simulate_coil_comb(data::Data) = simulate_coil_comb(data.mag, data.phase)
 function simulate_coil_comb(mag, phase)
     return mag[:,:,:,1] .* mag, rem2pi.(phase .- phase[:,:,:,1], RoundNearest)
@@ -101,72 +95,6 @@ function temporal_unwrap!(phase)
             phase[I,ieco] = phase[I,ieco-1] + rem2pi(phase[I,ieco] - phase[I,ieco-1], RoundNearest)
         end
     end
-end
-
-function monoexpfit(mag, phase, mask, TEs, islice)
-    function model(te, p)
-        res = @. p[1]^2 * exp(-p[2] * (te + TEs[1])) * exp((1.0im * 2π * p[3]) * (te - TEs[1]))
-        return make_flat(res)
-    end
-    p0 = [0.5, 0.01, 0.01]
-    lower = [0.01, 0.001, -1.0]
-    upper = [5.0, 0.2, 1.0]
-
-    
-    S0 = zeros(Float32, size(mag)[1:2])
-    r2s = zeros(Float32, size(mag)[1:2])
-    f = zeros(Float32, size(mag)[1:2])
-
-    for I in CartesianIndices(S0)
-        if mask[I,islice]
-            image = make_flat(mag[I,islice,:] .* exp.(1.0im .* phase[I,islice,:]))
-            S0[I], r2s[I], f[I] = coef(curve_fit(model, TEs, image, p0; autodiff=:forwarddiff))
-        end
-    end
-
-    ct = 0
-    for I in CartesianIndices(S0)
-        t = (S0[I], r2s[I], f[I])
-        box = filter(ind -> checkbounds(Bool, S0, ind), getboxaround((3,3), I))
-        if any(t .<= lower) || any(t .>= upper) || abs(f[I] - median(f[box])) > 0.05
-            ct += 1
-            
-            p0 = Float64.([median(S0[box]), median(r2s[box]), median(f[box])])
-            off = (0.0, 0.0, 0.01)
-            lower_new = p0 .- abs.(0.05 .* p0) .- off
-            upper_new = p0 .+ abs.(0.05 .* p0) .+ off
-            image = make_flat(mag[I,islice,:] .* exp.(1.0im .* phase[I,islice,:]))
-            S0[I], r2s[I], f[I] = coef(curve_fit(model, TEs, image, p0; lower=lower_new, upper=upper_new, autodiff=:forwarddiff))
-        end
-    end
-    @show ct
-
-    return S0, r2s, f
-end
-
-function monoexpfit(mag, phase, TEs)
-    function model(te, p)
-        res = @. p[1]^2 * exp(-p[2] * (te + TEs[1])) * exp((1.0im * 2π * p[3]) * (te - TEs[1]))
-        return make_flat(res)
-    end
-    p0 = [0.5, 0.01, 0.01]
-    lower = [0.01, 0.001, -1.0]
-    upper = [5.0, 0.2, 1.0]
-
-    image = make_flat(mag .* exp.(1.0im .* phase))
-    S0, r2s, f = coef(curve_fit(model, TEs, image, p0; autodiff=:forwarddiff))
-
-    return S0, r2s, f
-end
-
-function getboxaround(boxsize, idx=CartesianIndex(zeros(Int, length(boxsize))...))
-    width = div.((boxsize .- 1), 2)
-    r(x) = -x:x
-    return idx .+ CartesianIndices(r.(width))
-end
-
-function make_flat(c)
-    return [real.(c)..., imag.(c)...]
 end
 
 function average_filter(image; size=(7,7,1))
@@ -183,6 +111,61 @@ function frequency_mask(f, mask)
     return float.(L.(f))
 end
 
+# Fitting was quite problematic. For some of the acquisitions and mostly in regions of high frequency, 
+# the fit did not assume the desired minimum, leading to individual voxels were far off in all 3 fit parameters.
+function monoexpfit(mag, phase, mask, TEs, islice)
+    function model(te, p)
+        res = @. p[1]^2 * exp(-p[2] * (te + TEs[1])) * exp((1.0im * 2π * p[3]) * (te - TEs[1]))
+        return make_flat(res) # produces a real;imag vector with two times the length
+    end
+    S0 = zeros(Float32, size(mag)[1:2])
+    r2s = zeros(Float32, size(mag)[1:2])
+    f = zeros(Float32, size(mag)[1:2])
+
+    # Mein voxelwise Fitting loop
+    # No bounds were used here, as they lead to more voxels assuming a wrong minimum
+    # This loop takes most of the GEPCI time (200s per slice)
+    p0 = [0.5, 0.01, 0.01] # starting values
+    for I in CartesianIndices(S0)
+        if mask[I,islice]
+            image = make_flat(mag[I,islice,:] .* exp.(1.0im .* phase[I,islice,:]))
+            S0[I], r2s[I], f[I] = coef(curve_fit(model, TEs, image, p0; autodiff=:forwarddiff)) # :forwarddiff is only a speedup
+        end
+    end
+
+    # Second loop to fix most of the fitting mistakes by refitting values that are definetily wrong using close bounds
+    # This removes most individual voxels that were wrong, but some clusters remain
+    # This loop is quite fast as it refits only wrong voxels
+    lower = [0.01, 0.001, -1.0]
+    upper = [5.0, 0.2, 1.0]
+    for I in CartesianIndices(S0)
+        t = (S0[I], r2s[I], f[I])
+        box = filter(ind -> checkbounds(Bool, S0, ind), getboxaround((3,3), I))
+        if any(t .<= lower) || any(t .>= upper) || abs(f[I] - median(f[box])) > 0.05     
+            p0 = Float64.([median(S0[box]), median(r2s[box]), median(f[box])])
+            off = (0.0, 0.0, 0.01)
+            lower_new = p0 .- abs.(0.05 .* p0) .- off
+            upper_new = p0 .+ abs.(0.05 .* p0) .+ off
+            image = make_flat(mag[I,islice,:] .* exp.(1.0im .* phase[I,islice,:]))
+            S0[I], r2s[I], f[I] = coef(curve_fit(model, TEs, image, p0; lower=lower_new, upper=upper_new, autodiff=:forwarddiff))
+        end
+    end
+
+    return S0, r2s, f
+end
+
+# Utility functions for fitting
+function make_flat(c)
+    return [real.(c)..., imag.(c)...]
+end
+
+function getboxaround(boxsize, idx=CartesianIndex(zeros(Int, length(boxsize))...))
+    width = div.((boxsize .- 1), 2)
+    r(x) = -x:x
+    return idx .+ CartesianIndices(r.(width))
+end
+
+## GEPCI result images
 function SWI_like(S0, r2s, fmask_m, TE)
     return S0 .* exp.(-r2s .* TE) .* fmask_m
 end
