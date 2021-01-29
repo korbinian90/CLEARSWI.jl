@@ -22,6 +22,7 @@ combination_type: SNR
 sensitivity: nothing
 writedir: tmp
 writesteps: false
+magscale: identity
 """
 file = "$tmp_folder/settings_swi.txt"
 @test read(file, String) == text
