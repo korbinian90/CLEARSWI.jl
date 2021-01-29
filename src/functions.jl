@@ -226,6 +226,8 @@ end
 
 function get_single_echo_weighting(TEs, echostart_sim, echoend_sim)
     ΔTE = TEs[2] - TEs[1]
+    echoend_ME = TEs[end] + ΔTE / 2
+    echostart_ME = TEs[1] - ΔTE / 2
     if (echostart_sim + 1e-5) < echostart_ME || (echoend_sim - 1e-5) > echoend_ME || (echoend_sim - echostart_sim + 1e-5) < ΔTE
         error("Not possible to simulate [$(echostart_sim);$(echoend_sim)] from $TEs !")
     end

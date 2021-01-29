@@ -1,17 +1,17 @@
 using DSP, ImageFiltering, MriResearchTools
 quinnSWI(data, options::Options) = quinnSWI(data; m=options.level, writedir=options.writedir, writesteps=options.writesteps)
 quinnSWI(data, options) = quinnSWI(data; options...)
-function quinnSWI(data; m=4, f=7/3, writedir=raw"I:\Korbi\test\quinn", writesteps=false)
+function quinnSWI(data; m=4, reduction_factor=7/3, writedir=raw"I:\Korbi\test\quinn", writesteps=false)
     TEs = data.TEs
     hdr = data.header
     mag = data.mag
     phase = data.phase
     writesteps && savenii(phase[:,:,:,3], "ph3", writedir, hdr)
-    @time quinn_homodyne!(phase, mag, f)
+    quinn_homodyne!(phase, mag, reduction_factor)
     writesteps && savenii(phase[:,:,:,3], "homodyne3", writedir, hdr)
-    @time quinn_temporal_unwrap!(phase)
+    quinn_temporal_unwrap!(phase)
     writesteps && savenii(phase[:,:,:,3], "unwrapped", writedir, hdr)
-    @time f = MriResearchTools.calculateB0_unwrapped(phase, mag, TEs)
+    f = MriResearchTools.calculateB0_unwrapped(phase, mag, TEs)
     writesteps && savenii(f, "f", writedir, hdr)
     pmask = calculate_pmask(f, TEs, :lin)
     writesteps && savenii(pmask, "pmask", writedir, hdr)
@@ -30,9 +30,14 @@ function quinn_temporal_unwrap!(phase)
     end
 end
 
-function quinn_homodyne!(phase, mag, factor=1)
+function quinn_homodyne!(phase, mag, reduction_factor=7/3)
+    #= For the homodyne filter, a 2D Hann window (1 period of a
+    raised cosine) with dimensions equal to 30% (for multiecho) or
+    20% (for single-echo) of the respective matrix dimensions,
+    rounded to the nearest integer, was used. [Quinn et al. 2014] =#
+    # modification: window size is reduced to 30%/(7/3)≈13% to adjust for increased field 3->7
     for I in CartesianIndices(size(phase)[3:4])
-        hann_size = round.(Int, size(phase)[1:2] .* (0.3 / factor))
+        hann_size = round.(Int, size(phase)[1:2] .* (0.3 / reduction_factor))
         hann_window = centered(hanning(hann_size))
         slice = mag[:,:,I] .* exp.(1.0im .* phase[:,:,I])
         phase[:,:,I] = angle.(slice ./ imfilter(slice, hann_window))

@@ -177,7 +177,8 @@ end
 
 function frequency_mask(f, mask)
     # lower X stronger masking
-    @show X = estimatequantile(f .+ (.!mask .* NaN), 0.99) / 0.99 # quantile is used because maximum is unstable
+    @show X = estimatequantile(f .+ (.!mask .* NaN), 0.95) / 0.95 # quantile is used because maximum is unstable
+    @show X = 0.04
     L(x) = if x>X 0 elseif x<0 1 else 1 - x/X end
     return float.(L.(f))
 end

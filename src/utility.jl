@@ -7,7 +7,7 @@ end
 
 mutable struct Options
     σ::AbstractArray
-    unwrapping::Symbol
+    unwrapping
     mode::Symbol
     level::Number
     combination_type::Union{Symbol, Pair{Symbol,<:Number}, Pair{Symbol,Tuple{Symbol,Symbol}}}
