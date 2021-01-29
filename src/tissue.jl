@@ -11,14 +11,6 @@ PD = Dict(:gm => 0.71, :wm => 0.63, :ms => 0.68, :ven => 0.9 #=estimated=#)
 factor = Dict(  :B7T => Dict(:gm => 1.0, :wm => 0.95, :ven => 0.95, :csf => 0.7, :ms => 0.8, :iron_ring => 0.96), # estimated from 7T scan
                 :B3T => Dict(:gm => 1.0, :wm => 0.95, :ven => 0.95)) # estimated from 7T scan
 
-function gettissue(field)
-    T2s[field], T1[field], PD
-end
-
-function gettissue_all(field)
-    T2s[field], T1[field], PD, factor[field]
-end
-
 function gettissue_easy(field)
     T2s[field], factor[field]
 end

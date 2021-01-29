@@ -20,15 +20,12 @@ function Options(; mag_combine=:SNR, mag_sens=nothing, mag_softplus=true, phase_
     Options(mag_combine, mag_sens, mag_softplus, phase_unwrap, phase_hp_σ, phase_scaling_type, phase_scaling_strength, writesteps)
 end
 
-makestring(t::Pair{Symbol,Tuple{Symbol,Symbol}}) = "$(t[1])_$(t[2][1])_$(t[2][2])"
-makestring(s::Nothing) = "nothing"
-makestring(s) = string(s)
 function saveconfiguration(options)
     open(joinpath(options.writesteps, "settings_swi.txt"), "w") do io
         for fname in fieldnames(typeof(options))
             val = getfield(options, fname)
             if !(typeof(val) <: AbstractArray)
-                println(io, "$fname: " * makestring(val))
+                println(io, "$fname: " * string(val))
             end
         end
     end

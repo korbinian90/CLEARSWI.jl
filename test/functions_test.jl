@@ -8,6 +8,12 @@ phase_nii = readphase("$data_path/Phase.nii")
 data = Data(mag_nii, phase_nii, hdr, TEs)
 
 swi = calculateSWI(data)
+mip = createMIP(swi)
+
+# single-echo
+se_data = Data(mag_nii[:,:,:,1], phase_nii[:,:,:,1], hdr, TEs)
+swi = calculateSWI(data)
+mip = createMIP(swi)
 
 options = [
     Options()
