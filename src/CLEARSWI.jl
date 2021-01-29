@@ -6,6 +6,9 @@ using Statistics
 include("tissue.jl")
 include("utility.jl")
 include("functions.jl")
+include("magnitude_processing.jl")
+include("phase_processing.jl")
+include("simulate_single_echo.jl")
 
 export calculateSWI,
         createMIP,

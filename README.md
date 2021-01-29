@@ -1,3 +1,4 @@
+[![Build Status](https://github.com/korbinian90/CLEARSWI.jl/workflows/CI/badge.svg)](https://github.com/korbinian90/CLEARSWI.jl/actions)
 [![Build Status](https://ci.appveyor.com/api/projects/status/github/korbinian90/CLEARSWI.jl?svg=true)](https://ci.appveyor.com/project/korbinian90/CLEARSWI-jl)
 [![Codecov](https://codecov.io/gh/korbinian90/CLEARSWI.jl/branch/master/graph/badge.svg)](https://codecov.io/gh/korbinian90/CLEARSWI.jl)
 
@@ -33,8 +34,7 @@ mag = readmag(magfile);
 phase = readphase(phasefile);
 data = Data(mag, phase, mag.header, TEs);
 
-options = Options() # default CLEAR-SWI
-swi = calculateSWI(data, options);
+swi = calculateSWI(data);
 mip = createMIP(swi);
 
 savenii(swi, "<outputpath>/swi.nii"; header=mag.header) # change <outputpath> with the path where you want to save the reconstructed SWI
@@ -42,30 +42,32 @@ savenii(mip, "<outputpath>/mip.nii"; header=mag.header)
 ```
 
 ### Available Options
+To apply custom options use the following syntax (example to apply 3D high-pass filtering for the phase with the given kernel size and deactivate softplus magnitude scaling):
+
+```julia
+options = Options(phase_hp_σ=[10,10,5], mag_softplus=false)
+swi = calculateSWI(data, options);
+```
+
 The default options are
 ```julia
-Options(; σ=[4,4,0], unwrapping=:laplacian, mode=:tanh, level=4, combination_type=:SNR, sensitivity=nothing, writedir=nothing, writesteps=false, magscale=identity)
+Options(mag_combine=:SNR, mag_sens=nothing, mag_softplus=true, phase_unwrap=:laplacian, phase_hp_σ=[4,4,0], phase_scaling_type=:tanh, phase_scaling_strength=4, writesteps=nothing)
 ```
-* The `σ` is used for high-pass filtering and is given in voxel for the [x,y,z]-dimension.  
-`unwrapping` is either `:laplacian`, `:romeo`, or `:laplacianslice` (slicewise laplacian unwrapping)
+* `mag_combine` selects the echo combination for the magnitude. Options are `:SNR`; `:average`; `:last` to select the last echo; `(:CNR => (:gm, :wm))` to optimize the contrast between two selected tissues with the possible tissues classes to select in `src\tissue.jl`, currently only working for 7T; `(:echo => 3)` to select the 3rd echo; `(:closest => 15.3)` to select the echo that is closest to 15.3 ms; `(:SE => 15.3)` to simulate the contrast that would be achieved using a corresponding single-echo scan with 15.3 ms echo time.
 
-* `mode` is the scaling function to create the phase mask and can be `:tanh` for sigmoidal filtering, or `:positive`, `:negative`, and `:triangular` for traditional SWI application.
+* If `mag_sens` is set to an array, it is used instead of CLEAR-SWI sensitivity estimation. This can also be set to `mag_sens=[1]` to use the constant sensitivity of 1 and effectively avoid sensitivity correction.
 
-* `level` adjusts the strength of the created phase mask. A higher level is a stronger phase appearance. With a traditional SWI `mode` it corresponds to the power or number of phase mask multiplications.
+* To deactivate scaling of the combined magnitude with the softplus function, use `mag_softplus=false`.
 
-* `combination_type` selects the echo combination for the magnitude. Options are `:SNR`; `:average`; `:last` to select the last echo; `(:CNR => (:gm, :wm))` to optimize the contrast between two selected tissues with the possible tissues classes to select in `src\tissue.jl`; `(:echo => 3)` to select the 3rd echo; `(:closest => 15.3)` to select the echo that is closest to 15.3 ms; `(:SE => 15.3)` to simulate the contrast that would be achieved using a corresponding single-echo scan with 15.3 ms echo time.
+* `phase_unwrap` is either `:laplacian`, `:romeo`, or `:laplacianslice` (slicewise laplacian unwrapping)
 
-* Set `writesteps` to `true`, if you want the intermediate steps to be saved in the folder specified with `writedir="C:/tmp/clearswi_steps"`.
+* The `phase_hp_σ` is used for high-pass filtering and is given in voxel for the [x,y,z]-dimension.  
 
-* If `sensitivity` is set to an array, it is used instead of CLEAR-SWI sensitivity estimation. This can also be set to `sensitvity=[1]` to use the constant sensitivity of 1 and effectively avoid sensitivity correction.
+* `phase_scaling_type` is the scaling function to create the phase mask and can be `:tanh` for sigmoidal filtering, or `:positive`, `:negative`, and `:triangular` for traditional SWI application.
 
-* `magscale` makes it possible to use an additional scaling function after magnitude echo combination. In the publication, the following softplus function was definedand was used as `magscale=spq2`:
-```julia
-function spq2(X)
-    q = estimatequantile(X, 0.8)
-    CLEARSWI.softplus.(X, q/2, 2)
-end
-```
+* `phase_scaling_strength` adjusts the strength of the created phase mask. A higher phase_scaling_strength is a stronger phase appearance. With a traditional SWI `phase_scaling_type` it corresponds to the power or number of phase mask multiplications.
+
+* Set `writedir` to the path, where intermediate steps should be saved, e.g. `writedir="/tmp/clearswi_steps"`. If `nothing`, intermediate steps won't be saved.
 
 ## License
 This project is licensed under the MIT License - see the [LICENSE](https://github.com/korbinian90/CLEARSWI.jl/blob/master/LICENSE) for details

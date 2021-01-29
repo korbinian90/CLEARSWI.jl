@@ -6,29 +6,29 @@ struct Data
 end
 
 mutable struct Options
-    σ::AbstractArray
-    unwrapping::Symbol
-    mode::Symbol
-    level::Number
-    combination_type::Union{Symbol, Pair{Symbol,<:Number}, Pair{Symbol,Tuple{Symbol,Symbol}}}
-    sensitivity::Union{AbstractArray, Nothing}
-    writedir::Union{AbstractString, Nothing}
-    writesteps::Bool
-    magscale
+    mag_combine::Union{Symbol, Pair{Symbol,<:Real}, Pair{Symbol,Tuple{Symbol,Symbol}}}
+    mag_sens::Union{AbstractArray, Nothing}
+    mag_softplus::Bool
+    phase_unwrap::Symbol
+    phase_hp_σ::AbstractArray
+    phase_scaling_type::Symbol
+    phase_scaling_strength::Real
+    writesteps::Union{AbstractString, Nothing}
 end
 
-function Options(; σ=[4,4,0], unwrapping=:laplacian, mode=:tanh, level=4, combination_type=:SNR, sensitivity=nothing, writedir=nothing, writesteps=false, magscale=identity)
-    Options(σ, unwrapping, mode, level, combination_type, sensitivity, writedir, writesteps, magscale)
+function Options(; mag_combine=:SNR, mag_sens=nothing, mag_softplus=true, phase_unwrap=:laplacian, phase_hp_σ=[4,4,0], phase_scaling_type=:tanh, phase_scaling_strength=4, writesteps=nothing)
+    Options(mag_combine, mag_sens, mag_softplus, phase_unwrap, phase_hp_σ, phase_scaling_type, phase_scaling_strength, writesteps)
 end
 
-Base.string(t::Pair{Symbol,Tuple{Symbol,Symbol}}) = "$(t[1])_$(t[2][1])_$(t[2][2])"
-Base.string(s::Nothing) = "nothing"
+makestring(t::Pair{Symbol,Tuple{Symbol,Symbol}}) = "$(t[1])_$(t[2][1])_$(t[2][2])"
+makestring(s::Nothing) = "nothing"
+makestring(s) = string(s)
 function saveconfiguration(options)
-    open(joinpath(options.writedir, "settings_swi.txt"), "w") do io
+    open(joinpath(options.writesteps, "settings_swi.txt"), "w") do io
         for fname in fieldnames(typeof(options))
             val = getfield(options, fname)
             if !(typeof(val) <: AbstractArray)
-                println(io, "$fname: " * string(val))
+                println(io, "$fname: " * makestring(val))
             end
         end
     end

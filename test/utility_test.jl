@@ -1,28 +1,27 @@
 σ = [2,2,1]
-unwrapping = :laplacian
-mode = :linear
-level = 4
+phase_unwrap = :laplacian
+phase_scaling_type = :linear
+phase_scaling_strength = 4
 tmp_folder = "tmp"
-o = Options(;σ=σ, unwrapping=unwrapping, mode=mode, level=level, writedir=tmp_folder)
-@test o.σ == σ
-@test o.unwrapping == unwrapping
-@test o.mode == mode
-@test o.level == level
-@test o.combination_type == :SNR
-@test o.sensitivity == nothing
-@test o.writedir == "tmp"
-@test o.writesteps == false
+o = Options(phase_hp_σ=σ, phase_unwrap=phase_unwrap, phase_scaling_type=phase_scaling_type, phase_scaling_strength=phase_scaling_strength, writesteps=tmp_folder)
+@test o.phase_hp_σ == σ
+@test o.phase_unwrap == phase_unwrap
+@test o.phase_scaling_type == phase_scaling_type
+@test o.phase_scaling_strength == phase_scaling_strength
+@test o.mag_combine == :SNR
+@test o.mag_sens === nothing
+@test o.writesteps == "tmp"
+@test o.mag_softplus == true
 
 mkpath(tmp_folder)
 saveconfiguration(o)
-text = """unwrapping: laplacian
-mode: linear
-level: 4
-combination_type: SNR
-sensitivity: nothing
-writedir: tmp
-writesteps: false
-magscale: identity
+text = """mag_combine: SNR
+mag_sens: nothing
+mag_softplus: true
+phase_unwrap: laplacian
+phase_scaling_type: linear
+phase_scaling_strength: 4
+writesteps: tmp
 """
 file = "$tmp_folder/settings_swi.txt"
 @test read(file, String) == text
