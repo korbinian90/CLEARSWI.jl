@@ -1,8 +1,3 @@
-[![Build Status](https://travis-ci.com/korbinian90/CLEARSWI.jl.svg?branch=master)](https://travis-ci.com/korbinian90/CLEARSWI.jl)
-[![Build Status](https://ci.appveyor.com/api/projects/status/github/korbinian90/CLEARSWI.jl?svg=true)](https://ci.appveyor.com/project/korbinian90/CLEARSWI-jl)
-[![Codecov](https://codecov.io/gh/korbinian90/CLEARSWI.jl/branch/master/graph/badge.svg)](https://codecov.io/gh/korbinian90/CLEARSWI.jl)
-[![Coveralls](https://coveralls.io/repos/github/korbinian90/CLEARSWI.jl/badge.svg?branch=master)](https://coveralls.io/github/korbinian90/CLEARSWI.jl?branch=master)
-
 # Susceptibility Weighted Imaging (CLEAR SWI)
 Published at the [ISMRM as CLEAR SWI](https://index.mirasmart.com/ISMRM2020/PDFfiles/3201.html). It provides magnetic resonance images with improved vein and iron contrast by weighting the magnitude image with a preprocessed phase image. This package has the additional capability of multi-echo SWI, intensity correction and improved phase processing. It can also work with classical single-echo SWI. It was developed to solve artefacts at ultra-high field strength (7T), however, it also drastically improves the SWI quality at lower field strength.
 
