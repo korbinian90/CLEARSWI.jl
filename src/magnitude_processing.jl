@@ -61,7 +61,7 @@ function combine_weighted(mag, w)
     for ieco in 1:size(mag, 4)
         combined .+= mag[:,:,:,ieco] .* w[ieco]
     end
-    combined
+    return combined ./ sum(w)
 end
 
 function softplus_scaling(mag)
