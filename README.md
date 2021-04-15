@@ -42,16 +42,23 @@ savenii(mip, "<outputpath>/mip.nii"; header=mag.header)
 ```
 
 ### Available Options
-To apply custom options use the following syntax (example to apply 3D high-pass filtering for the phase with the given kernel size and deactivate softplus magnitude scaling):
+To apply custom options use the following keyword syntax (example to apply 3D high-pass filtering for the phase with the given kernel size and deactivate softplus magnitude scaling):
 
 ```julia
 options = Options(phase_hp_σ=[10,10,5], mag_softplus=false)
 swi = calculateSWI(data, options);
 ```
 
-The default options are
+All the possible options with the default values are
 ```julia
-Options(mag_combine=:SNR, mag_sens=nothing, mag_softplus=true, phase_unwrap=:laplacian, phase_hp_σ=[4,4,0], phase_scaling_type=:tanh, phase_scaling_strength=4, writesteps=nothing)
+mag_combine=:SNR
+mag_sens=nothing
+mag_softplus=true
+phase_unwrap=:laplacian
+phase_hp_σ=[4,4,0]
+phase_scaling_type=:tanh
+phase_scaling_strength=4
+writesteps=nothing)
 ```
 * `mag_combine` selects the echo combination for the magnitude. Options are `:SNR`; `:average`; `:last` to select the last echo; `(:CNR => (:gm, :wm))` to optimize the contrast between two selected tissues with the possible tissues classes to select in `src\tissue.jl`, currently only working for 7T; `(:echo => 3)` to select the 3rd echo; `(:closest => 15.3)` to select the echo that is closest to 15.3 ms; `(:SE => 15.3)` to simulate the contrast that would be achieved using a corresponding single-echo scan with 15.3 ms echo time.
 
