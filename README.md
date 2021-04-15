@@ -67,7 +67,7 @@ Options(mag_combine=:SNR, mag_sens=nothing, mag_softplus=true, phase_unwrap=:lap
 
 * `phase_scaling_strength` adjusts the strength of the created phase mask. A higher phase_scaling_strength is a stronger phase appearance. With a traditional SWI `phase_scaling_type` it corresponds to the power or number of phase mask multiplications.
 
-* Set `writedir` to the path, where intermediate steps should be saved, e.g. `writedir="/tmp/clearswi_steps"`. If `nothing`, intermediate steps won't be saved.
+* Set `writesteps` to the path, where intermediate steps should be saved, e.g. `writesteps="/tmp/clearswi_steps"`. If `nothing`, intermediate steps won't be saved.
 
 ## License
 This project is licensed under the MIT License - see the [LICENSE](https://github.com/korbinian90/CLEARSWI.jl/blob/master/LICENSE) for details
