@@ -20,7 +20,7 @@ function creatphasemask!(swiphase, mask, phase_scaling_type, phase_scaling_stren
 
     elseif phase_scaling_type == :positive
         swiphase[.!pos] .= 1
-        swiphase[pos] .= robustrescale(swiphase[pos], 1, 0.5) .^ phase_scaling_strength
+        swiphase[pos] .= robustrescale(swiphase[pos], 1, 0) .^ phase_scaling_strength
 
     elseif phase_scaling_type == :negative
         swiphase[pos] .= 1
