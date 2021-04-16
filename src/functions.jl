@@ -4,6 +4,7 @@
 Returns the calculated SWI using 'data' and 'options'.
 """
 function calculateSWI(data, options=Options())
+    if !isnothing(options.writesteps) mkpath(options.writesteps) end
     getswimag(data, options) .* getswiphase(data, options)
 end
 
