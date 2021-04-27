@@ -58,7 +58,7 @@ phase_unwrap=:laplacian
 phase_hp_σ=[4,4,0]
 phase_scaling_type=:tanh
 phase_scaling_strength=4
-writesteps=nothing)
+writesteps=nothing
 ```
 * `mag_combine` selects the echo combination for the magnitude. Options are 
     * `:SNR`
