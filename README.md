@@ -3,14 +3,14 @@
 [![Codecov](https://codecov.io/gh/korbinian90/CLEARSWI.jl/branch/master/graph/badge.svg)](https://codecov.io/gh/korbinian90/CLEARSWI.jl)
 
 # Susceptibility Weighted Imaging (CLEAR-SWI)
-Published at the [ISMRM as CLEAR-SWI](https://index.mirasmart.com/ISMRM2020/PDFfiles/3201.html). It provides magnetic resonance images with improved vein and iron contrast by weighting the magnitude image with a preprocessed phase image. This package has the additional capability of multi-echo SWI, intensity correction and improved phase processing. It can also work with classical single-echo SWI. It was developed to solve artefacts at ultra-high field strength (7T), however, it also drastically improves the SWI quality at lower field strength.
+Published at the [ISMRM as CLEAR-SWI](https://index.mirasmart.com/ISMRM2020/PDFfiles/3201.html). It provides magnetic resonance images with improved vein and iron contrast by weighting a combined magnitude image with a preprocessed phase image. This package has the additional capability of multi-echo SWI, intensity correction, contrast enhancement and improved phase processing. The reason for the development of this package was to solve artefacts at ultra-high field strength (7T), however, it also drastically improves the SWI quality at lower field strength.
 
 ## Getting Started
 
 ### Prerequisites
 A Julia installation ≥ 1.3
 
-Magnitude and Phase images in NIfTI fileformat (4D images with echoes in the 4th dimension)
+Single-echo or multi-echo Magnitude and Phase images in NIfTI fileformat (4D images with echoes in the 4th dimension)
 
 ### Installing
 Open the REPL in Julia and type
@@ -26,7 +26,7 @@ This is a simple multi-echo case without changing default behavior
 using CLEARSWI
 
 TEs = [4,8,12] # change this to the Echo Time of your sequence. For multi-echoes, set a list of TE values, else set a list with a single TE value.
-nifti_folder = CLEARSWI.dir("test","testData","small") # replace with path to your folder e.g. nifti_folder="/Users/korbinian/data"
+nifti_folder = CLEARSWI.dir("test","testData","small") # replace with path to your folder e.g. nifti_folder="/data/clearswi"
 magfile = joinpath(nifti_folder, "Mag.nii") # Path to the magnitude image in nifti format, must be .nii or .hdr
 phasefile = joinpath(nifti_folder, "Phase.nii") # Path to the phase image
 
@@ -60,7 +60,14 @@ phase_scaling_type=:tanh
 phase_scaling_strength=4
 writesteps=nothing)
 ```
-* `mag_combine` selects the echo combination for the magnitude. Options are `:SNR`; `:average`; `:last` to select the last echo; `(:CNR => (:gm, :wm))` to optimize the contrast between two selected tissues with the possible tissues classes to select in `src\tissue.jl`, currently only working for 7T; `(:echo => 3)` to select the 3rd echo; `(:closest => 15.3)` to select the echo that is closest to 15.3 ms; `(:SE => 15.3)` to simulate the contrast that would be achieved using a corresponding single-echo scan with 15.3 ms echo time.
+* `mag_combine` selects the echo combination for the magnitude. Options are 
+    * `:SNR`
+    * `:average`
+    * `:last` to select the last echo
+    * `(:CNR => (:gm, :wm))` to optimize the contrast between two selected tissues with the possible tissues classes to select in `src\tissue.jl`, currently only working for 7T
+    * `(:echo => 3)` to select the 3rd echo 
+    * `(:closest => 15.3)` to select the echo that is closest to 15.3 ms 
+    * `(:SE => 15.3)` to simulate the contrast that would be achieved using a corresponding single-echo scan with 15.3 ms echo time.
 
 * If `mag_sens` is set to an array, it is used instead of CLEAR-SWI sensitivity estimation. This can also be set to `mag_sens=[1]` to use the constant sensitivity of 1 and effectively avoid sensitivity correction.
 
@@ -70,11 +77,11 @@ writesteps=nothing)
 
 * The `phase_hp_σ` is used for high-pass filtering and is given in voxel for the [x,y,z]-dimension.  
 
-* `phase_scaling_type` is the scaling function to create the phase mask and can be `:tanh` for sigmoidal filtering, or `:positive`, `:negative`, and `:triangular` for traditional SWI application.
+* `phase_scaling_type` is the scaling function to create the phase mask and can be `:tanh` for sigmoidal filtering, or `:positive`, `:negative`, and `:triangular` for traditional SWI application. If the scaling has the wrong sign, the phase input can be simply inverted by a minus sign: `phase = -readphase(phasefile);`
 
 * `phase_scaling_strength` adjusts the strength of the created phase mask. A higher phase_scaling_strength is a stronger phase appearance. With a traditional SWI `phase_scaling_type` it corresponds to the power or number of phase mask multiplications.
 
-* Set `writesteps` to the path, where intermediate steps should be saved, e.g. `writesteps="/tmp/clearswi_steps"`. If `nothing`, intermediate steps won't be saved.
+* Set `writesteps` to the path, where intermediate steps should be saved, e.g. `writesteps="/tmp/clearswi_steps"`. If set to `nothing`, intermediate steps won't be saved.
 
 ## License
 This project is licensed under the MIT License - see the [LICENSE](https://github.com/korbinian90/CLEARSWI.jl/blob/master/LICENSE) for details
