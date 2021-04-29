@@ -20,6 +20,7 @@ text = """mag_combine: :CNR => (:gm, :wm)
 mag_sens: nothing
 mag_softplus: true
 phase_unwrap: laplacian
+phase_hp_σ: [2, 2, 1]
 phase_scaling_type: linear
 phase_scaling_strength: 4
 writesteps: tmp
