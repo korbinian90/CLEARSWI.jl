@@ -5,10 +5,10 @@ struct Data
     TEs::AbstractArray
 end
 
-mutable struct Options
-    mag_combine::Union{Symbol, Pair{Symbol,<:Real}, Pair{Symbol,Tuple{Symbol,Symbol}}}
+struct Options
+    mag_combine
     mag_sens::Union{AbstractArray, Nothing}
-    mag_softplus::Bool
+    mag_softplus
     phase_unwrap::Symbol
     phase_hp_σ::AbstractArray
     phase_scaling_type::Symbol
@@ -24,7 +24,7 @@ function saveconfiguration(options)
     open(joinpath(options.writesteps, "settings_swi.txt"), "w") do io
         for fname in fieldnames(typeof(options))
             val = getfield(options, fname)
-            if !(typeof(val) <: AbstractArray)
+            if !(val isa AbstractArray && !(val isa Vector))
                 println(io, "$fname: " * string(val))
             end
         end

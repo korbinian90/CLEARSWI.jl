@@ -65,7 +65,7 @@ function getcombinedphase(data, options, mask)
             unwrapped[:,:,iSlc,iEco] .-= smoothed
         end
         combined = combine_phase(unwrapped, mag, TEs)
-        savenii(unwrapped, "unwrapped", options.writesteps, data.header)
+        savenii(unwrapped, "unwrappedphase", options.writesteps, data.header)
         savenii(combined, "combinedphase", options.writesteps, data.header)
 
     elseif options.phase_unwrap == :romeo

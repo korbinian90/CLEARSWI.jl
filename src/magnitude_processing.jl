@@ -2,9 +2,9 @@ function getswimag(data, options)
     combined_mag = combine_echoes_swi(data.mag, data.TEs, options.mag_combine)
     savenii(combined_mag, "combined_mag", options.writesteps, data.header)
     swimag = sensitivity_correction(combined_mag, data, options)
-    if options.mag_softplus
+    if options.mag_softplus !== false
         savenii(swimag, "sensitivity_corrected_mag", options.writesteps, data.header)
-        swimag = softplus_scaling(swimag)
+        swimag = softplus_scaling(swimag, options.mag_softplus)
     end
     savenii(swimag, "swimag", options.writesteps, data.header)
     return swimag
@@ -32,8 +32,13 @@ function combine_echoes_swi(mag, TEs, type)
     elseif typeof(type) <: Pair
         type, para = type
         if type == :CNR
-            (w1, w2) = para
-            weighting = calculate_cnr_weighting(TEs, w1, w2)
+            if length(para) == 2
+                (w1, w2) = para
+                field = :B7T
+            else
+                (w1, w2, field) = para
+            end
+            weighting = calculate_cnr_weighting(TEs, w1, w2; field=field)
             return combine_weighted(mag, weighting)
         elseif type == :SE
             TE_SE = para
@@ -44,9 +49,17 @@ function combine_echoes_swi(mag, TEs, type)
             return mag[:,:,:,eco]
         elseif type == :echo
             return mag[:,:,:,para]
+        elseif type == :average
+            return sum(mag[:,:,:,para]; dims=4)
         end
     end
     throw("ERROR: $type not defined for combination of echoes!")
+end
+
+function calculate_cnr_weighting(TEs, w1::Tuple, w2::Tuple; unusedargs...)
+    S(TE, w) = w[1] * exp(-TE / w[2])
+    w(TE, w1, w2) = S(TE, w1) - S(TE, w2)
+    return w.(TEs, Ref(w1), Ref(w2))
 end
 
 function calculate_cnr_weighting(TEs, w1, w2; field=:B7T)
@@ -64,9 +77,17 @@ function combine_weighted(mag, w)
     return combined ./ sum(w)
 end
 
-function softplus_scaling(mag)
+function softplus_scaling(mag, para)
     q = estimatequantile(mag, 0.8)
-    softplus.(mag, q/2)
+    if para === true
+        return softplus.(mag, q/2)
+    elseif para isa Number
+        return softplus.(mag, para * q)
+    elseif para isa Tuple
+        return softplus.(mag, para[1] * q, para[2])
+    else
+        error("wrong input for softplus: got $para")
+    end
 end
 
 function softplus(val, offset, factor=2)
