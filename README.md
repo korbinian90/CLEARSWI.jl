@@ -8,12 +8,12 @@ Published at the [ISMRM as CLEAR-SWI](https://index.mirasmart.com/ISMRM2020/PDFf
 ## Getting Started
 
 ### Prerequisites
-A Julia installation ≥ 1.3
+A Julia installation ≥ 1.3 ([Official Julia Webpage](https://julialang.org/downloads/))
 
 Single-echo or multi-echo Magnitude and Phase images in NIfTI fileformat (4D images with echoes in the 4th dimension)
 
 ### Installing
-Open the REPL in Julia and type
+Run the following commands in Julia (either interactively in the REPL or as a script)
 
 ```julia
 using Pkg
