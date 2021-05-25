@@ -83,5 +83,28 @@ writesteps=nothing
 
 * Set `writesteps` to the path, where intermediate steps should be saved, e.g. `writesteps="/tmp/clearswi_steps"`. If set to `nothing`, intermediate steps won't be saved.
 
+### Calculating T2* and B0 maps on multi-echo datasets
+T2* and B0 maps can be calculated using the package [MriResearchTools](https://github.com/korbinian90/MriResearchTools.jl):
+
+#### Installing:
+
+```julia
+using Pkg
+Pkg.add(PackageSpec(url="https://github.com/korbinian90/MriResearchTools.jl"))
+```
+
+#### Usage:
+With the previously defined variables `phase`, `mag` and `TEs`
+
+```julia
+using MriResearchTools
+
+unwrapped = romeo(phase; mag=mag, TEs=TEs) # type ?romeo in REPL for options
+B0 = calculateB0_unwrapped(unwrapped, mag, TEs) # inverse variance weighted
+
+t2s = NumART2star(mag, TEs)
+r2s = r2s_from_t2s(t2s)
+```
+
 ## License
 This project is licensed under the MIT License - see the [LICENSE](https://github.com/korbinian90/CLEARSWI.jl/blob/master/LICENSE) for details
