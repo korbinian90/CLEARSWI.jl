@@ -1,5 +1,9 @@
+# echo formatting test for 2d row vector
+Data(mag_nii, phase_nii, hdr, [4 8 12])
+
+# load data
 data_path = "testData/small"
-TEs = [4,8,12]
+TEs = [4, 8, 12]
 
 mag_nii = readmag("$data_path/Mag.nii")
 hdr = mag_nii.header
@@ -7,11 +11,12 @@ phase_nii = readphase("$data_path/Phase.nii")
 
 data = Data(mag_nii, phase_nii, hdr, TEs)
 
+# default test
 swi = calculateSWI(data)
 mip = createMIP(swi)
 
 # single-echo
-se_data = Data(mag_nii[:,:,:,1], phase_nii[:,:,:,1], hdr, TEs)
+se_data = Data(mag_nii[:,:,:,1], phase_nii[:,:,:,1], hdr)
 swi = calculateSWI(data)
 mip = createMIP(swi)
 

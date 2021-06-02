@@ -2,7 +2,8 @@ struct Data
     mag::AbstractArray
     phase::AbstractArray
     header
-    TEs::AbstractArray
+    TEs::AbstractVector
+    Data(mag, phase, header, TEs=1:size(mag,4)) = new(mag, phase, header, vec(TEs))
 end
 
 struct Options
