@@ -1,6 +1,3 @@
-# echo formatting test for 2d row vector
-Data(mag_nii, phase_nii, hdr, [4 8 12])
-
 # load data
 data_path = "testData/small"
 TEs = [4, 8, 12]
@@ -10,6 +7,9 @@ hdr = mag_nii.header
 phase_nii = readphase("$data_path/Phase.nii")
 
 data = Data(mag_nii, phase_nii, hdr, TEs)
+
+# echo formatting test for 2d row vector
+Data(mag_nii, phase_nii, hdr, [4 8 12])
 
 # default test
 swi = calculateSWI(data)
