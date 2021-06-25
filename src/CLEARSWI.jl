@@ -12,6 +12,7 @@ include("simulate_single_echo.jl")
 
 export calculateSWI,
         createMIP,
+        createIntensityProjection,
         saveconfiguration,
         Data,
         Options,

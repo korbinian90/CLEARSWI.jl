@@ -14,6 +14,10 @@ Data(mag_nii, phase_nii, hdr, [4 8 12])
 # default test
 swi = calculateSWI(data)
 mip = createMIP(swi)
+mIP = createIntensityProjection(swi, minimum)
+MIP = createIntensityProjection(swi, maximum)
+mean(I) = sum(I) / length(I)
+meanIP = createIntensityProjection(swi, mean)
 
 # single-echo
 se_data = Data(mag_nii[:,:,:,1], phase_nii[:,:,:,1], hdr)

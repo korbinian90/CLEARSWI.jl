@@ -8,6 +8,8 @@ function calculateSWI(data, options=Options())
     getswimag(data, options) .* getswiphase(data, options)
 end
 
-function createMIP(S, d=7)
-    [minimum(S[x,y,z:z+d-1]) for x in 1:size(S,1), y in 1:size(S,2), z in 1:size(S,3)-d+1]
+createMIP(S, d=7) = createIntensityProjection(S, minimum, d)
+
+function createIntensityProjection(S, func, d=7)
+    [func(S[x,y,z:z+d-1]) for x in 1:size(S,1), y in 1:size(S,2), z in 1:size(S,3)-d+1]
 end
