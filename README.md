@@ -16,9 +16,17 @@ Single-echo or multi-echo Magnitude and Phase images in NIfTI fileformat (4D ima
 Run the following commands in Julia (either interactively in the REPL or as a script)
 
 ```julia
-using Pkg
-Pkg.add(PackageSpec(url="https://github.com/korbinian90/CLEARSWI.jl"))
+using Pkg; Pkg.add(PackageSpec(url="https://github.com/korbinian90/CLEARSWI.jl"))
 ```
+
+### Updating
+To update CLEARSWI to the newest version run
+
+```julia
+using Pkg; Pkg.update("CLEARSWI")
+```
+
+and **restart Julia**.
 
 ### Usage
 This is a simple multi-echo case without changing default behavior
