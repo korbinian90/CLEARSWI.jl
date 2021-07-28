@@ -35,7 +35,8 @@ phase = readphase(phasefile);
 data = Data(mag, phase, mag.header, TEs);
 
 swi = calculateSWI(data);
-mip = createIntensityProjection(swi, minimum); # minimum intensity projection, other Julia functions can be used instead of minimum
+# mip = createIntensityProjection(swi, minimum); # minimum intensity projection, other Julia functions can be used instead of minimum
+mip = createMIP(swi); # shorthand for createIntensityProjection(swi, minimum)
 
 savenii(swi, "<outputpath>/swi.nii"; header=mag.header) # change <outputpath> with the path where you want to save the reconstructed SWI
 savenii(mip, "<outputpath>/mip.nii"; header=mag.header)
