@@ -99,7 +99,7 @@ T2* and B0 maps can be calculated using the package [MriResearchTools](https://g
 
 ```julia
 using Pkg
-Pkg.add(PackageSpec(url="https://github.com/korbinian90/MriResearchTools.jl"))
+Pkg.add(PackageSpec("MriResearchTools"))
 ```
 
 #### Usage:
