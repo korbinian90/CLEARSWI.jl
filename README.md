@@ -86,7 +86,7 @@ writesteps=nothing
 
 * The `phase_hp_σ` is used for high-pass filtering and is given in voxel for the [x,y,z]-dimension.  
 
-* `phase_scaling_type` is the scaling function to create the phase mask and can be `:tanh` for sigmoidal filtering, or `:positive`, `:negative`, and `:triangular` for traditional SWI application. If the scaling has the wrong sign, the phase input can be simply inverted by a minus sign: `phase = -readphase(phasefile);`
+* `phase_scaling_type` is the scaling function to create the phase mask and can be `:tanh` or `:negativetanh` for sigmoidal filtering, or `:positive`, `:negative`, and `:triangular` for traditional SWI application.
 
 * `phase_scaling_strength` adjusts the strength of the created phase mask. A higher phase_scaling_strength is a stronger phase appearance. With a traditional SWI `phase_scaling_type` it corresponds to the power or number of phase mask multiplications.
 

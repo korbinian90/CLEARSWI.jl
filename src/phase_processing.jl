@@ -12,6 +12,11 @@ function creatphasemask!(swiphase, mask, phase_scaling_type, phase_scaling_stren
     swiphase[.!mask] .= 0
     pos = swiphase .> 0
 
+    if phase_scaling_type == :negativetanh
+        swiphase = -swiphase
+        phase_scaling_type = :tanh
+    end
+
     if phase_scaling_type == :tanh
         m = median(swiphase[mask .& (swiphase .> 0)])
         m *= 10 / phase_scaling_strength

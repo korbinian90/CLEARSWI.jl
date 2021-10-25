@@ -30,6 +30,7 @@ options = [
     Options(phase_unwrap=:romeo)
     Options(phase_unwrap=:laplacianslice)
     Options(phase_scaling_type=:positive)
+    Options(phase_scaling_type=:negativetanh)
     Options(phase_scaling_type=:negative)
     Options(phase_scaling_type=:triangular)
     Options(phase_scaling_strength=6)
