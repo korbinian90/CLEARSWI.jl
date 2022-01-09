@@ -17,6 +17,7 @@ Run the following commands in Julia (either interactively in the REPL or as a sc
 
 ```julia
 using Pkg; Pkg.add(PackageSpec(url="https://github.com/korbinian90/CLEARSWI.jl"))
+Pkg.add("FFTW") # This is required when using laplacian unwrapping
 ```
 
 ### Updating

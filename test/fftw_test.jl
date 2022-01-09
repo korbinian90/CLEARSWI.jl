@@ -1,3 +1,4 @@
+using FFTW
 # load data
 data_path = "testData/small"
 TEs = [4, 8, 12]
@@ -21,12 +22,14 @@ meanIP = createIntensityProjection(swi, mean)
 
 # single-echo
 se_data = Data(mag_nii[:,:,:,1], phase_nii[:,:,:,1], hdr)
-swi = calculateSWI(data, Options(phase_unwrap=:romeo))
+swi = calculateSWI(data)
 mip = createMIP(swi)
 
 options = [
     Options()
     Options(phase_hp_σ=[6,6,3])
+    Options(phase_unwrap=:romeo)
+    Options(phase_unwrap=:laplacianslice)
     Options(phase_scaling_type=:positive)
     Options(phase_scaling_type=:negativetanh)
     Options(phase_scaling_type=:negative)
@@ -56,9 +59,6 @@ wrong_options = [
 
 s = []
 for o in options
-    # change phase unwrap to romeo
-    kw = Dict(f=>getfield(o,f) for f in fieldnames(typeof(o)))
-    o = Options(; kw..., phase_unwrap=:romeo)
     push!(s, calculateSWI(data, o)[:,:,20])
 end
 
