@@ -56,7 +56,7 @@ function getcombinedphase(data, options, mask)
         savenii(unwrapped, "unwrappedphase", options.writesteps, data.header)
 
         for iEco in 1:size(phase, 4)
-            smoothed = gaussiansmooth3d(unwrapped[:,:,:,iEco], σ; mask=mask, dims=1:3)
+            smoothed = gaussiansmooth3d(unwrapped[:,:,:,iEco], σ; mask, dims=1:3)
             unwrapped[:,:,:,iEco] .-= smoothed
         end
         combined = combine_phase(unwrapped, mag, TEs)
@@ -74,13 +74,13 @@ function getcombinedphase(data, options, mask)
         savenii(combined, "combinedphase", options.writesteps, data.header)
 
     elseif options.phase_unwrap == :romeo
-        unwrapped = romeo(phase, mag=mag, TEs=TEs)#, mask = mask)
+        unwrapped = romeo(phase; mag, TEs)#, mask = mask)
         savenii(unwrapped, "unwrappedphase", options.writesteps, data.header)
 
         combined = combine_phase(unwrapped, mag, TEs)
         savenii(combined, "combinedphase", options.writesteps, data.header)
 
-        combined .-= gaussiansmooth3d(combined, σ; mask = mask, dims = 1:2)
+        combined .-= gaussiansmooth3d(combined, σ; mask, dims=1:2)
         savenii(combined, "filteredphase", options.writesteps, data.header)
 
     else
@@ -95,7 +95,7 @@ function combine_phase(unwrapped::AbstractArray{T,4}, mag, TEs) where T
     dims = 4
     TEs = reshape(TEs, ones(Int, dims-1)..., length(TEs)) # size = (1,1,1,nEco)
 
-    combined = sum(unwrapped .* TEs .* mag .* mag; dims=dims)
-    combined ./= sum(mag .* mag .* float.(TEs).^2; dims=dims)
-    return dropdims(combined; dims=dims)
+    combined = sum(unwrapped .* TEs .* mag .* mag; dims)
+    combined ./= sum(mag .* mag .* float.(TEs).^2; dims)
+    return dropdims(combined; dims)
 end
