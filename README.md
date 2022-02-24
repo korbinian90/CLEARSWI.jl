@@ -8,9 +8,9 @@ Published as [CLEAR-SWI](https://doi.org/10.1016/j.neuroimage.2021.118175). It p
 ## Download standalone executables
 https://github.com/korbinian90/CompileMRI.jl/releases
 
-## Getting Started
+## Getting Started (julia version)
 
-### Prerequisites (julia version)
+### Prerequisites
 A Julia installation ≥ 1.3 ([Official Julia Webpage](https://julialang.org/downloads/))
 
 Single-echo or multi-echo Magnitude and Phase images in NIfTI fileformat (4D images with echoes in the 4th dimension)
