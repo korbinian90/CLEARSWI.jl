@@ -5,9 +5,12 @@
 # Susceptibility Weighted Imaging (CLEAR-SWI)
 Published as [CLEAR-SWI](https://doi.org/10.1016/j.neuroimage.2021.118175). It provides magnetic resonance images with improved vein and iron contrast by weighting a combined magnitude image with a preprocessed phase image. This package has the additional capability of multi-echo SWI, intensity correction, contrast enhancement and improved phase processing. The reason for the development of this package was to solve artefacts at ultra-high field strength (7T), however, it also drastically improves the SWI quality at lower field strength.
 
+## Download standalone executables
+https://github.com/korbinian90/CompileMRI.jl/releases
+
 ## Getting Started
 
-### Prerequisites
+### Prerequisites (julia version)
 A Julia installation ≥ 1.3 ([Official Julia Webpage](https://julialang.org/downloads/))
 
 Single-echo or multi-echo Magnitude and Phase images in NIfTI fileformat (4D images with echoes in the 4th dimension)
