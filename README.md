@@ -35,7 +35,7 @@ and **restart Julia**.
 ### Usage
 This is a simple multi-echo case without changing default behavior
 ```julia
-using CLEARSWI
+using CLEARSWI, FFTW
 
 TEs = [4,8,12] # change this to the Echo Time of your sequence. For multi-echoes, set a list of TE values, else set a list with a single TE value.
 nifti_folder = CLEARSWI.dir("test","testData","small") # replace with path to your folder e.g. nifti_folder="/data/clearswi"
