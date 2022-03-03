@@ -19,7 +19,7 @@ Single-echo or multi-echo Magnitude and Phase images in NIfTI fileformat (4D ima
 Run the following commands in Julia (either interactively in the REPL or as a script)
 
 ```julia
-using Pkg; Pkg.add(PackageSpec(url="https://github.com/korbinian90/CLEARSWI.jl"))
+import Pkg; Pkg.add(PackageSpec(url="https://github.com/korbinian90/CLEARSWI.jl"))
 Pkg.add("FFTW") # This is required when using laplacian unwrapping
 ```
 
@@ -27,7 +27,7 @@ Pkg.add("FFTW") # This is required when using laplacian unwrapping
 To update CLEARSWI to the newest version run
 
 ```julia
-using Pkg; Pkg.update("CLEARSWI")
+import Pkg; Pkg.update("CLEARSWI")
 ```
 
 and **restart Julia**.
@@ -35,7 +35,7 @@ and **restart Julia**.
 ### Usage
 This is a simple multi-echo case without changing default behavior
 ```julia
-using CLEARSWI
+using CLEARSWI, FFTW
 
 TEs = [4,8,12] # change this to the Echo Time of your sequence. For multi-echoes, set a list of TE values, else set a list with a single TE value.
 nifti_folder = CLEARSWI.dir("test","testData","small") # replace with path to your folder e.g. nifti_folder="/data/clearswi"
