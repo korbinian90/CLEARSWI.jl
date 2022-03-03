@@ -1,5 +1,5 @@
+[![Dev](https://img.shields.io/badge/docs-dev-blue.svg)](https://korbinian90.github.io/CLEARSWI.jl/dev)
 [![Build Status](https://github.com/korbinian90/CLEARSWI.jl/workflows/CI/badge.svg)](https://github.com/korbinian90/CLEARSWI.jl/actions)
-[![Build Status](https://ci.appveyor.com/api/projects/status/github/korbinian90/CLEARSWI.jl?svg=true)](https://ci.appveyor.com/project/korbinian90/CLEARSWI-jl)
 [![Codecov](https://codecov.io/gh/korbinian90/CLEARSWI.jl/branch/master/graph/badge.svg)](https://codecov.io/gh/korbinian90/CLEARSWI.jl)
 
 # Susceptibility Weighted Imaging (CLEAR-SWI)
