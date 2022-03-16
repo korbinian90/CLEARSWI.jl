@@ -3,12 +3,12 @@ function getswiphase(data, options)
     savenii(mask, "maskforphase", options.writesteps, data.header)
     # TODO output not readable
     combined = getcombinedphase(data, options, mask)
-    swiphase = creatphasemask!(combined, mask, options.phase_scaling_type, options.phase_scaling_strength)
+    swiphase = createphasemask!(combined, mask, options.phase_scaling_type, options.phase_scaling_strength)
     savenii(swiphase, "swiphase", options.writesteps, data.header)
     return swiphase
 end
 
-function creatphasemask!(swiphase, mask, phase_scaling_type, phase_scaling_strength)
+function createphasemask!(swiphase, mask, phase_scaling_type, phase_scaling_strength)
     swiphase[.!mask] .= 0
     pos = swiphase .> 0
 
