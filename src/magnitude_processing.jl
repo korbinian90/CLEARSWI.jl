@@ -26,7 +26,7 @@ function combine_echoes_swi(mag, TEs, type)
     elseif type == :SNR
         return RSS(mag)
     elseif type == :average
-        return sum(mag; dims=4)
+        return dropdims(sum(mag; dims=4); dims=4)
     elseif type == :last
         return mag[:,:,:,end]
     elseif typeof(type) <: Pair
