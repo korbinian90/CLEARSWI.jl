@@ -32,6 +32,9 @@ import Pkg; Pkg.update("CLEARSWI")
 
 and **restart Julia**.
 
+### Function Reference
+https://korbinian90.github.io/CLEARSWI.jl/dev
+
 ### Usage
 This is a simple multi-echo case without changing default behavior
 ```julia
