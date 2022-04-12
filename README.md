@@ -19,7 +19,7 @@ Single-echo or multi-echo Magnitude and Phase images in NIfTI fileformat (4D ima
 Run the following commands in Julia (either interactively in the REPL or as a script)
 
 ```julia
-import Pkg; Pkg.add(PackageSpec(url="https://github.com/korbinian90/CLEARSWI.jl"))
+import Pkg; Pkg.add(Pkg.PackageSpec(url="https://github.com/korbinian90/CLEARSWI.jl"))
 Pkg.add("FFTW") # This is required when using laplacian unwrapping
 ```
 
@@ -31,6 +31,9 @@ import Pkg; Pkg.update("CLEARSWI")
 ```
 
 and **restart Julia**.
+
+### Function Reference
+https://korbinian90.github.io/CLEARSWI.jl/dev
 
 ### Usage
 This is a simple multi-echo case without changing default behavior
