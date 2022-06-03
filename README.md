@@ -20,7 +20,6 @@ Run the following commands in Julia (either interactively in the REPL or as a sc
 
 ```julia
 import Pkg; Pkg.add(Pkg.PackageSpec(url="https://github.com/korbinian90/CLEARSWI.jl"))
-Pkg.add("FFTW") # This is required when using laplacian unwrapping
 ```
 
 ### Updating
@@ -38,7 +37,7 @@ https://korbinian90.github.io/CLEARSWI.jl/dev
 ### Usage
 This is a simple multi-echo case without changing default behavior
 ```julia
-using CLEARSWI, FFTW
+using CLEARSWI
 
 TEs = [4,8,12] # change this to the Echo Time of your sequence. For multi-echoes, set a list of TE values, else set a list with a single TE value.
 nifti_folder = CLEARSWI.dir("test","testData","small") # replace with path to your folder e.g. nifti_folder="/data/clearswi"

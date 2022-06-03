@@ -1,4 +1,3 @@
-using FFTW
 # load data
 data_path = "testData/small"
 TEs = [4, 8, 12]
