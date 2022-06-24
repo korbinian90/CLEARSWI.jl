@@ -90,12 +90,8 @@ function getcombinedphase(data, options, mask)
     return combined
 end
 
+# returns B0 in [Hz] if TEs in [ms]
 combine_phase(unwrapped::AbstractArray{T,3}, mag, TEs) where T = copy(unwrapped) # one echo
 function combine_phase(unwrapped::AbstractArray{T,4}, mag, TEs) where T
-    dims = 4
-    TEs = reshape(TEs, ones(Int, dims-1)..., length(TEs)) # size = (1,1,1,nEco)
-
-    combined = sum(unwrapped .* TEs .* mag .* mag; dims)
-    combined ./= sum(mag .* mag .* float.(TEs).^2; dims)
-    return dropdims(combined; dims)
+    return calculateB0_unwrapped(unwrapped, mag, TEs)
 end
