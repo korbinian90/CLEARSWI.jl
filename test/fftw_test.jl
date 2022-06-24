@@ -28,7 +28,7 @@ options = [
     Options()
     Options(phase_hp_σ=[6,6,3])
     Options(phase_unwrap=:romeo)
-    Options(phase_unwrap=:laplacianslice)
+    #Options(phase_unwrap=:laplacianslice) # currently a weird FFTW bug sometimes occuring
     Options(phase_scaling_type=:positive)
     Options(phase_scaling_type=:negativetanh)
     Options(phase_scaling_type=:negative)
