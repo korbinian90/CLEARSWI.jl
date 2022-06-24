@@ -1,12 +1,12 @@
 name = "CLEARSWI"
 uuid = "06ae4d9b-ce5e-4813-a1b3-426e46312ec2"
 authors = ["Korbinian Eckstein"]
-version = "0.3.4"
+version = "0.3.5"
 
 [deps]
 MriResearchTools = "557dad86-b9bd-4533-8525-1a39684d020f"
 Statistics = "10745b16-79ce-11e8-11f9-7d13ad32a3b2"
 
 [compat]
-MriResearchTools = "0.8"
+MriResearchTools = "0.8.1"
 julia = "1.5"
