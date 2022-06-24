@@ -92,6 +92,11 @@ end
 
 function softplus(val, offset, factor=2)
     f = factor / offset
-    sp(x) = log(1 + exp(f * (x - offset))) / f
+    # stable implementation
+    function sp(x)
+        arg = f * (x - offset)
+        soft = log(1 + exp(-abs(arg))) + max(0, arg)
+        return soft / f
+    end
     return sp(val) - sp(0)
 end
