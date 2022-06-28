@@ -11,7 +11,7 @@ https://github.com/korbinian90/CompileMRI.jl/releases
 ## Getting Started (julia version)
 
 ### Prerequisites
-A Julia installation ≥ 1.3 ([Official Julia Webpage](https://julialang.org/downloads/))
+A Julia installation ≥ 1.5 ([Official Julia Webpage](https://julialang.org/downloads/))
 
 Single-echo or multi-echo Magnitude and Phase images in NIfTI fileformat (4D images with echoes in the 4th dimension)
 
