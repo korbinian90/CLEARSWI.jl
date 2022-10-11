@@ -49,6 +49,8 @@ end
 * `phase_scaling_strength` adjusts the strength of the created phase mask. A higher `phase_scaling_strength` is a stronger phase appearance. With a traditional SWI `phase_scaling_type` it corresponds to the power or number of phase mask multiplications.
 
 * Set `writesteps` to the path, where intermediate steps should be saved, e.g. `writesteps="/tmp/clearswi_steps"`. If set to `nothing`, intermediate steps won't be saved.
+
+* Set `qsm` to true
 """
 struct Options
     mag_combine
@@ -59,9 +61,10 @@ struct Options
     phase_scaling_type::Symbol
     phase_scaling_strength::Real
     writesteps::Union{AbstractString, Nothing}
+    qsm::Bool
 end
-function Options(; mag_combine=:SNR, mag_sens=nothing, mag_softplus=true, phase_unwrap=:laplacian, phase_hp_σ=[4,4,0], phase_scaling_type=:tanh, phase_scaling_strength=4, writesteps=nothing)
-    Options(mag_combine, mag_sens, mag_softplus, phase_unwrap, phase_hp_σ, phase_scaling_type, phase_scaling_strength, writesteps)
+function Options(; mag_combine=:SNR, mag_sens=nothing, mag_softplus=true, phase_unwrap=:laplacian, phase_hp_σ=[4,4,0], phase_scaling_type=:tanh, phase_scaling_strength=4, writesteps=nothing, qsm=false)
+    Options(mag_combine, mag_sens, mag_softplus, phase_unwrap, phase_hp_σ, phase_scaling_type, phase_scaling_strength, writesteps, qsm)
 end
 
 """

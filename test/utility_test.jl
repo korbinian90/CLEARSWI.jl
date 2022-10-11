@@ -24,6 +24,7 @@ phase_hp_σ: [2, 2, 1]
 phase_scaling_type: linear
 phase_scaling_strength: 4
 writesteps: tmp
+qsm: false
 """
 file = "$tmp_folder/settings_swi.txt"
 @test read(file, String) == text

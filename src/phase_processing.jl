@@ -47,46 +47,74 @@ function getcombinedphase(data, options, mask)
     mag = data.mag
     TEs = to_dim(data.TEs, 4)
     σ = options.phase_hp_σ
+    save(image, name) = savenii(image, name, options.writesteps, data.header)
 
-    unwrapped = similar(phase)
-    if options.phase_unwrap == :laplacian
-        for iEco in 1:size(phase, 4)
-            unwrapped[:,:,:,iEco] .= laplacianunwrap(view(phase,:,:,:,iEco))
-        end
-        savenii(unwrapped, "unwrappedphase", options.writesteps, data.header)
+    if options.qsm
+        vsz = data.header.pixdim[2:4]
+        return qsm(phase, mag, TEs, σ, vsz, save)
 
-        for iEco in 1:size(phase, 4)
-            smoothed = gaussiansmooth3d(unwrapped[:,:,:,iEco], σ; mask, dims=1:3)
-            unwrapped[:,:,:,iEco] .-= smoothed
-        end
-        combined = combine_phase(unwrapped, mag, TEs)
-        savenii(unwrapped, "filteredphase", options.writesteps, data.header)
-        savenii(combined, "combinedphase", options.writesteps, data.header)
+    elseif options.phase_unwrap == :laplacian
+        return laplacian_combine(phase, mag, TEs, mask, σ, save)
 
     elseif options.phase_unwrap == :laplacianslice
-        for iEco in 1:size(phase, 4), iSlc in 1:size(phase, 3)
-            unwrapped[:,:,iSlc,iEco] .= laplacianunwrap(view(phase,:,:,iSlc,iEco))
-            smoothed = gaussiansmooth3d(unwrapped[:,:,iSlc,iEco], σ; mask=mask[:,:,iSlc], dims=1:2)
-            unwrapped[:,:,iSlc,iEco] .-= smoothed
-        end
-        combined = combine_phase(unwrapped, mag, TEs)
-        savenii(unwrapped, "unwrappedphase", options.writesteps, data.header)
-        savenii(combined, "combinedphase", options.writesteps, data.header)
+        return laplacianslice_combine(phase, mag, TEs, mask, σ, save)
 
     elseif options.phase_unwrap == :romeo
-        unwrapped = romeo(phase; mag, TEs)#, mask = mask)
-        savenii(unwrapped, "unwrappedphase", options.writesteps, data.header)
-
-        combined = combine_phase(unwrapped, mag, TEs)
-        savenii(combined, "combinedphase", options.writesteps, data.header)
-
-        combined .-= gaussiansmooth3d(combined, σ; mask, dims=1:2)
-        savenii(combined, "filteredphase", options.writesteps, data.header)
-
-    else
-        error("Unwrapping $options.phase_unwrap ($(typeof(options.phase_unwrap))) not defined!")
+        return romeo_combine(phase, mag, TEs, mask, σ, save)
     end
 
+    error("Unwrapping $options.phase_unwrap ($(typeof(options.phase_unwrap))) not defined!")
+end
+
+function qsm(phase, mag, TEs, σ, vsz, save)
+    mask = qsm_mask_filled(phase[:,:,:,1])
+    save(mask, "qsm_mask")
+    combined = qsm_average(phase, mag, mask, TEs, vsz) # uses laplacian
+    save(combined, "qsm_average_laplacian")
+    combined .-= gaussiansmooth3d(combined, σ; mask, dims=1:2)
+    save(combined, "filteredphase")
+    return combined
+end
+
+function laplacian_combine(phase, mag, TEs, mask, σ, save)
+    unwrapped = similar(phase)
+    for iEco in 1:size(phase, 4)
+        unwrapped[:,:,:,iEco] .= laplacianunwrap(view(phase,:,:,:,iEco))
+    end
+    save(unwrapped, "unwrappedphase")
+
+    for iEco in 1:size(phase, 4)
+        smoothed = gaussiansmooth3d(unwrapped[:,:,:,iEco], σ; mask, dims=1:3)
+        unwrapped[:,:,:,iEco] .-= smoothed
+    end
+    combined = combine_phase(unwrapped, mag, TEs)
+    save(unwrapped, "filteredphase")
+    save(combined, "combinedphase")
+    return combined
+end
+
+function laplacianslice_combine(phase, mag, TEs, mask, σ, save)
+    unwrapped = similar(phase)
+    for iEco in 1:size(phase, 4), iSlc in 1:size(phase, 3)
+        unwrapped[:,:,iSlc,iEco] .= laplacianunwrap(view(phase,:,:,iSlc,iEco))
+        smoothed = gaussiansmooth3d(unwrapped[:,:,iSlc,iEco], σ; mask=mask[:,:,iSlc], dims=1:2)
+        unwrapped[:,:,iSlc,iEco] .-= smoothed
+    end
+    combined = combine_phase(unwrapped, mag, TEs)
+    save(unwrapped, "unwrappedphase")
+    save(combined, "combinedphase")
+    return combined
+end
+
+function romeo_combine(phase, mag, TEs, mask, σ, save)
+    unwrapped = romeo(phase; mag, TEs)#, mask = mask)
+    save(unwrapped, "unwrappedphase")
+
+    combined = combine_phase(unwrapped, mag, TEs)
+    save(combined, "combinedphase")
+
+    combined .-= gaussiansmooth3d(combined, σ; mask, dims=1:2)
+    save(combined, "filteredphase")
     return combined
 end
 
