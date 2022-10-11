@@ -26,7 +26,7 @@ mip = createMIP(swi)
 
 options = [
     Options()
-    Options(phase_hp_σ=[6,6,3])
+    Options(phase_hp_sigma=[6,6,3])
     Options(phase_unwrap=:romeo)
     #Options(phase_unwrap=:laplacianslice) # currently a weird FFTW bug sometimes occuring
     Options(phase_scaling_type=:positive)

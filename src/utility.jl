@@ -22,7 +22,7 @@ end
                 mag_sens=nothing,
                 mag_softplus=true,
                 phase_unwrap=:laplacian,
-                phase_hp_σ=[4,4,0],
+                phase_hp_sigma=[4,4,0],
                 phase_scaling_type=:tanh,
                 phase_scaling_strength=4,
                 writesteps=nothing)
@@ -42,7 +42,7 @@ end
 
 * `phase_unwrap` is either `:laplacian`, `:romeo`, or `:laplacianslice` (slicewise laplacian unwrapping)
 
-* The `phase_hp_σ` is used for high-pass filtering and is given in voxel for the [x,y,z]-dimension.  
+* The `phase_hp_sigma` is used for high-pass filtering and is given in voxel for the [x,y,z]-dimension.  
 
 * `phase_scaling_type` is the scaling function to create the phase mask and can be `:tanh` or `:negativetanh` for sigmoidal filtering, or `:positive`, `:negative`, and `:triangular` for traditional SWI application.
 
@@ -57,14 +57,14 @@ struct Options
     mag_sens::Union{AbstractArray, Nothing}
     mag_softplus
     phase_unwrap::Symbol
-    phase_hp_σ::AbstractArray
+    phase_hp_sigma::AbstractArray
     phase_scaling_type::Symbol
     phase_scaling_strength::Real
     writesteps::Union{AbstractString, Nothing}
     qsm::Bool
 end
-function Options(; mag_combine=:SNR, mag_sens=nothing, mag_softplus=true, phase_unwrap=:laplacian, phase_hp_σ=[4,4,0], phase_scaling_type=:tanh, phase_scaling_strength=4, writesteps=nothing, qsm=false)
-    Options(mag_combine, mag_sens, mag_softplus, phase_unwrap, phase_hp_σ, phase_scaling_type, phase_scaling_strength, writesteps, qsm)
+function Options(; mag_combine=:SNR, mag_sens=nothing, mag_softplus=true, phase_unwrap=:laplacian, phase_hp_sigma=[4,4,0], phase_scaling_type=:tanh, phase_scaling_strength=4, writesteps=nothing, qsm=false)
+    Options(mag_combine, mag_sens, mag_softplus, phase_unwrap, phase_hp_sigma, phase_scaling_type, phase_scaling_strength, writesteps, qsm)
 end
 
 """

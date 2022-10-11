@@ -46,7 +46,7 @@ function getcombinedphase(data, options, mask)
     phase = data.phase
     mag = data.mag
     TEs = to_dim(data.TEs, 4)
-    σ = options.phase_hp_σ
+    σ = options.phase_hp_sigma
     save(image, name) = savenii(image, name, options.writesteps, data.header)
 
     if options.qsm

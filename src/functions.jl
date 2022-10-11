@@ -16,7 +16,7 @@ $(@doc Options)
 ```julia-repl
 julia> TEs = [4,8,12]
 julia> data = Data(mag, phase, header(mag), TEs);
-julia> options = Options(phase_hp_σ=[10,10,5], mag_softplus=false)
+julia> options = Options(phase_hp_sigma=[10,10,5], mag_softplus=false)
 julia> swi = calculateSWI(data, options);
 ```
 """

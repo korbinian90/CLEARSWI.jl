@@ -30,7 +30,7 @@ mip = createMIP(swi)
 
 options = [
     Options()
-    Options(phase_hp_σ=[6,6,3])
+    Options(phase_hp_sigma=[6,6,3])
     Options(phase_scaling_type=:positive)
     Options(phase_scaling_type=:negativetanh)
     Options(phase_scaling_type=:negative)
