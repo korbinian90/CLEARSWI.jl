@@ -1,7 +1,7 @@
 @testitem "qsm" begin
 cd(@__DIR__)
 # load data
-data_path = "testData/small"
+data_path = "data/small"
 TEs = [4, 8, 12]
 
 mag_nii = readmag("$data_path/Mag.nii")
