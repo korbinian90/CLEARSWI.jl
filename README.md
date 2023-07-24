@@ -4,13 +4,29 @@
 
 ![test_clear_swi_github](https://user-images.githubusercontent.com/1307522/194285019-60e0e0a3-1bf5-4563-86bd-4201de2be08b.png)
 
+Apply CLEARSWI in the command line without Julia programming experience. This repository contains the CLEARSWI algorithm and a command line interface (previously [CLEARSWI.jl](https://github.com/korbinian90/CLEARSWI.jl)).
+
 # Susceptibility Weighted Imaging (CLEAR-SWI)
 Published as [CLEAR-SWI](https://doi.org/10.1016/j.neuroimage.2021.118175). It provides magnetic resonance images with improved vein and iron contrast by weighting a combined magnitude image with a preprocessed phase image. This package has the additional capability of multi-echo SWI, intensity correction, contrast enhancement and improved phase processing. The reason for the development of this package was to solve artefacts at ultra-high field strength (7T), however, it also drastically improves the SWI quality at lower field strength.
 
 ## Download standalone executables
 https://github.com/korbinian90/CompileMRI.jl/releases
 
-## Getting Started (julia version)
+## Usage - command line
+
+Install Julia 1.9 or newer (https://julialang.org)  
+Copy the file `clearswi.jl` from this repository to a convenient location. An alias for `clearswi` as `julia <path-to-file>/clearswi.jl` might be useful.
+
+```bash
+    $ julia <path-to-file>/clearswi.jl -p phase.nii -m mag.nii -t [2.1,4.2,6.3] -o results
+```
+
+On the first run, the dependencies will be installed automatically.
+
+For an extended explanation of the command line interface see [ROMEO](https://github.com/korbinian90/ROMEO)  
+
+
+## Usage - Julia
 
 ### Prerequisites
 A Julia installation ≥ 1.5 ([Official Julia Webpage](https://julialang.org/downloads/))
@@ -42,7 +58,7 @@ This is a simple multi-echo case without changing default behavior
 using CLEARSWI
 
 TEs = [4,8,12] # change this to the Echo Time of your sequence. For multi-echoes, set a list of TE values, else set a list with a single TE value.
-nifti_folder = CLEARSWI.dir("test","testData","small") # replace with path to your folder e.g. nifti_folder="/data/clearswi"
+nifti_folder = CLEARSWI.dir("test","data","small") # replace with path to your folder e.g. nifti_folder="/data/clearswi"
 magfile = joinpath(nifti_folder, "Mag.nii") # Path to the magnitude image in nifti format, must be .nii or .hdr
 phasefile = joinpath(nifti_folder, "Phase.nii") # Path to the phase image
 
