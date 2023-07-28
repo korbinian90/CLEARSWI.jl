@@ -8,8 +8,8 @@
 Published as [CLEAR-SWI](https://doi.org/10.1016/j.neuroimage.2021.118175). It provides magnetic resonance images with improved vein and iron contrast by weighting a combined magnitude image with a preprocessed phase image. This package has the additional capability of multi-echo SWI, intensity correction, contrast enhancement and improved phase processing. The reason for the development of this package was to solve artefacts at ultra-high field strength (7T), however, it also drastically improves the SWI quality at lower field strength.
 
 ## Download standalone executables
-https://github.com/korbinian90/CompileMRI.jl/releases
-For usage help run the command line program in `bin/clearswi` without arguments or see below.
+https://github.com/korbinian90/CompileMRI.jl/releases  
+For usage help, run the command line program in `bin/clearswi` without arguments or see [below](https://github.com/korbinian90/CLEARSWI.jl/edit/master/README.md#command-line-help).
 
 ## Getting Started (julia version)
 
@@ -125,6 +125,7 @@ r2s = r2s_from_t2s(t2s)
 ```
 
 ## Command Line Help
+```
 $ .\bin\clearswi
 usage: <PROGRAM> [-m MAGNITUDE] [-p PHASE] [-o OUTPUT]
                  [-t ECHO-TIMES [ECHO-TIMES...]] [--qsm]
@@ -196,6 +197,7 @@ optional arguments:
   -v, --verbose         verbose output messages
   --version             show version information and exit
   -h, --help            show this help message and exit
+```
 
 ## License
 This project is licensed under the MIT License - see the [LICENSE](https://github.com/korbinian90/CLEARSWI.jl/blob/master/LICENSE) for details
