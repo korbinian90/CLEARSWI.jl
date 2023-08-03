@@ -1,6 +1,7 @@
 using CLEARSWI
 using Test
 using TestItemRunner
+using Statistics
 
 @testset "CLEARSWI.jl" begin 
     @testset "Utils Tests" begin include("utility_test.jl") end

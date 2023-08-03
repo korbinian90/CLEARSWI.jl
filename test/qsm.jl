@@ -1,5 +1,3 @@
-@testitem "qsm" begin
-cd(@__DIR__)
 # load data
 data_path = "data/small"
 TEs = [4, 8, 12]
@@ -11,4 +9,3 @@ data = Data(mag_nii, phase_nii, hdr, TEs)
 # QSM test
 qsm_run = calculateSWI(data, Options(qsm=true))
 @test qsm_run != calculateSWI(data)
-end

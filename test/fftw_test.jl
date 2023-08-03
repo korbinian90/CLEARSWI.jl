@@ -16,7 +16,6 @@ swi = calculateSWI(data, Options(phase_unwrap=:romeo))
 mip = createMIP(swi)
 mIP = createIntensityProjection(swi, minimum)
 MIP = createIntensityProjection(swi, maximum)
-mean(I) = sum(I) / length(I)
 meanIP = createIntensityProjection(swi, mean)
 
 # single-echo
