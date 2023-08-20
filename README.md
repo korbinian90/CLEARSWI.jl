@@ -8,7 +8,8 @@
 Published as [CLEAR-SWI](https://doi.org/10.1016/j.neuroimage.2021.118175). It provides magnetic resonance images with improved vein and iron contrast by weighting a combined magnitude image with a preprocessed phase image. This package has the additional capability of multi-echo SWI, intensity correction, contrast enhancement and improved phase processing. The reason for the development of this package was to solve artefacts at ultra-high field strength (7T), however, it also drastically improves the SWI quality at lower field strength.
 
 ## Download standalone executables
-https://github.com/korbinian90/CompileMRI.jl/releases
+https://github.com/korbinian90/CompileMRI.jl/releases  
+For usage help, run the command line program in `bin/clearswi` without arguments or see [below](https://github.com/korbinian90/CLEARSWI.jl/edit/master/README.md#command-line-help).
 
 ## Getting Started (julia version)
 
@@ -121,6 +122,81 @@ B0 = calculateB0_unwrapped(unwrapped, mag, TEs) # inverse variance weighted
 
 t2s = NumART2star(mag, TEs)
 r2s = r2s_from_t2s(t2s)
+```
+
+## Command Line Help
+```
+$ .\bin\clearswi
+usage: <PROGRAM> [-m MAGNITUDE] [-p PHASE] [-o OUTPUT]
+                 [-t ECHO-TIMES [ECHO-TIMES...]] [--qsm]
+                 [--mag-combine MAG-COMBINE [MAG-COMBINE...]]
+                 [--mag-sensitivity-correction MAG-SENSITIVITY-CORRECTION]
+                 [--mag-softplus-scaling MAG-SOFTPLUS-SCALING]
+                 [--unwrapping-algorithm UNWRAPPING-ALGORITHM]
+                 [--filter-size FILTER-SIZE [FILTER-SIZE...]]
+                 [--phase-scaling-type PHASE-SCALING-TYPE]
+                 [--phase-scaling-strength PHASE-SCALING-STRENGTH]
+                 [-e ECHOES [ECHOES...]] [-N] [--no-phase-rescale]
+                 [--writesteps WRITESTEPS] [-v] [--version] [-h]
+
+3.6.4
+
+optional arguments:
+  -m, --magnitude MAGNITUDE
+                        The magnitude image (single or multi-echo)
+  -p, --phase PHASE     The phase image (single or multi-echo)
+  -o, --output OUTPUT   The output path or filename (default:
+                        "clearswi.nii")
+  -t, --echo-times ECHO-TIMES [ECHO-TIMES...]
+                        The echo times are required for multi-echo
+                        datasets specified in array or range syntax
+                        (eg. "[1.5,3.0]" or "3.5:3.5:14").
+  --qsm                 When activated uses QSM for phase weighting
+  --mag-combine MAG-COMBINE [MAG-COMBINE...]
+                        SNR | average | echo <n> | SE <te>. Magnitude
+                        combination algorithm. echo <n> selects a
+                        specific echo; SE <te> simulates a single echo
+                        scan of the given echo time. (default:
+                        ["SNR"])
+  --mag-sensitivity-correction MAG-SENSITIVITY-CORRECTION
+                        <filename> | on | off. Use the CLEAR-SWI
+                        sensitivity correction. Alternatively, a
+                        sensitivity map can be read from a file
+                        (default: "on")
+  --mag-softplus-scaling MAG-SOFTPLUS-SCALING
+                        on | off. Set softplus scaling of the
+                        magnitude (default: "on")
+  --unwrapping-algorithm UNWRAPPING-ALGORITHM
+                        laplacian | romeo | laplacianslice (default:
+                        "laplacian")
+  --filter-size FILTER-SIZE [FILTER-SIZE...]
+                        Size for the high-pass phase filter in voxels.
+                        Can be given as <x> <y> <z> or in array syntax
+                        (e.g. [2.2,3.1,0], which is effectively a 2D
+                        filter). (default: ["[4,4,0]"])
+  --phase-scaling-type PHASE-SCALING-TYPE
+                        tanh | negativetanh | positive | negative |
+                        triangular Select the type of phase scaling.
+                        positive or negative with a strength of 3-6 is
+                        used in standard SWI. (default: "tanh")
+  --phase-scaling-strength PHASE-SCALING-STRENGTH
+                        Sets the phase scaling strength. Corresponds
+                        to power values for positive, negative and
+                        triangular phase scaling type. (default: "4")
+  -e, --echoes ECHOES [ECHOES...]
+                        Load only the specified echoes from disk
+                        (default: [":"])
+  -N, --no-mmap         Deactivate memory mapping. Memory mapping
+                        might cause problems on network storage
+  --no-phase-rescale    Deactivate automatic rescaling of phase
+                        images. By default the input phase is rescaled
+                        to the range [-π;π].
+  --writesteps WRITESTEPS
+                        Set to the path of a folder, if intermediate
+                        steps should be saved.
+  -v, --verbose         verbose output messages
+  --version             show version information and exit
+  -h, --help            show this help message and exit
 ```
 
 ## License
