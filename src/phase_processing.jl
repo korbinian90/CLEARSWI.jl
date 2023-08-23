@@ -51,7 +51,7 @@ function getcombinedphase(data, options, mask)
 
     if options.qsm
         vsz = data.header.pixdim[2:4]
-        return qsm(phase, mag, TEs, σ, vsz, save)
+        return qsm_contrast(phase, mag, TEs, σ, vsz, save)
 
     elseif options.phase_unwrap == :laplacian
         return laplacian_combine(phase, mag, TEs, mask, σ, save)
@@ -63,10 +63,10 @@ function getcombinedphase(data, options, mask)
         return romeo_combine(phase, mag, TEs, mask, σ, save)
     end
 
-    error("Unwrapping $options.phase_unwrap ($(typeof(options.phase_unwrap))) not defined!")
+    error("Unwrapping $(options.phase_unwrap) ($(typeof(options.phase_unwrap))) not defined!")
 end
 
-function qsm(phase, mag, TEs, σ, vsz, save)
+function qsm_contrast(phase, mag, TEs, σ, vsz, save)
     mask = qsm_mask_filled(phase[:,:,:,1])
     save(mask, "qsm_mask")
     combined = qsm_average(phase, mag, mask, TEs, vsz) # uses laplacian

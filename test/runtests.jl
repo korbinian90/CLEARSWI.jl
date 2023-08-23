@@ -1,10 +1,21 @@
 using CLEARSWI
 using Test
-using TestItemRunner
+using Statistics
 
-@time begin
-    @time @testset "Utils Tests" begin include("utility_test.jl") end
-    @time @testset "Functions Test" begin include("functions_test.jl") end
-    @time @testset "With FFTW Test" begin include("fftw_test.jl") end
+@testset "CLEARSWI.jl" begin 
+    @testset "Utils Tests" begin include("utility_test.jl") end
+    @testset "Functions Test" begin include("functions_test.jl") end
+    @testset "With FFTW Test" begin include("fftw_test.jl") end
+end
+
+@testset "ClearswiApp.jl" begin
+    include("ClearswiApp.jl")
+end
+
+@testset "QSM" begin
     include("qsm.jl")
 end
+
+## print version to verify
+println()
+clearswi_main(["--version"])

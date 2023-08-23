@@ -1,9 +1,6 @@
 name: CI
 on:
   push:
-    branches:
-      - master
-    tags: '*'
   pull_request:
 concurrency:
   # Skip intermediate builds: always.
@@ -19,7 +16,7 @@ jobs:
       matrix:
         version:
           - '1.6'
-          - '1.7'
+          - '1.9'
           - 'nightly'
         os:
           - ubuntu-latest

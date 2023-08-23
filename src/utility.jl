@@ -8,7 +8,7 @@ struct Data
     phase::AbstractArray
     header
     TEs::AbstractVector
-    Data(mag, phase, header, TEs) = new(mag, phase, header, vec(TEs))
+    Data(mag, phase, header, TEs) = new(float.(mag), float.(phase), header, vec(TEs))
 end
 function Data(mag, phase, header)
     if size(mag,4) != 1

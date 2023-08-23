@@ -1,5 +1,5 @@
 # load data
-data_path = "testData/small"
+data_path = "data/small"
 TEs = [4, 8, 12]
 
 mag_nii = readmag("$data_path/Mag.nii")
@@ -14,13 +14,11 @@ data = Data(mag_nii, phase_nii, hdr, TEs)
 # echo formatting test for 2d row vector
 Data(mag_nii, phase_nii, hdr, [4 8 12])
 
-print("real data tests")
 # default test
 swi = calculateSWI(data, Options(phase_unwrap=:romeo))
 mip = createMIP(swi)
 mIP = createIntensityProjection(swi, minimum)
 MIP = createIntensityProjection(swi, maximum)
-mean(I) = sum(I) / length(I)
 meanIP = createIntensityProjection(swi, mean)
 
 # single-echo
