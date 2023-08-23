@@ -10,7 +10,7 @@ data = Data(mag_nii, phase_nii, hdr, TEs)
 
 # echo formatting test for 2d row vector
 Data(mag_nii, phase_nii, hdr, [4 8 12])
-print("real data tests")
+
 # default test
 swi = calculateSWI(data, Options(phase_unwrap=:romeo))
 mip = createMIP(swi)

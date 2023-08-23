@@ -1,4 +1,4 @@
-@testset "ClearswiApp.jl" begin
+using ArgParse
 
 original_path = abspath(".")
 p = abspath(joinpath("data", "small"))
@@ -89,5 +89,3 @@ test_clearswi(["-p", phasefile_1eco, "-m", magfile_1eco, "-t", "5"])
 cd(original_path)
 GC.gc()
 rm(tmpdir, recursive=true)
-
-end

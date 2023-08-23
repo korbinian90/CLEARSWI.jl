@@ -1,6 +1,5 @@
 using CLEARSWI
 using Test
-using TestItemRunner
 using Statistics
 
 @testset "CLEARSWI.jl" begin 
@@ -10,7 +9,6 @@ using Statistics
 end
 
 @testset "ClearswiApp.jl" begin
-    using ArgParse
     include("ClearswiApp.jl")
 end
 

@@ -1,3 +1,5 @@
+using QSM
+
 # load data
 data_path = "data/small"
 TEs = [4, 8, 12]
