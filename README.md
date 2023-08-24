@@ -29,7 +29,6 @@ On the first run, the dependencies will be installed automatically.
 
 For an extended explanation of the command line interface see [below](https://github.com/korbinian90/CLEARSWI).
 
-
 ## Usage - Julia
 
 ### Prerequisites
@@ -45,16 +44,6 @@ Run the following commands in Julia (either interactively in the REPL or as a sc
 ```julia
 import Pkg; Pkg.add("CLEARSWI")
 ```
-
-### Updating
-
-To update CLEARSWI to the newest version run
-
-```julia
-import Pkg; Pkg.update("CLEARSWI")
-```
-
-and **restart Julia**.
 
 ### Function Reference
 
@@ -135,9 +124,11 @@ T2* and B0 maps can be calculated using the package [MriResearchTools](https://g
 
 #### Installing
 
+B0 and R2*/T2* calculation requires the package `MriResearchTools`
+
 ```julia
 using Pkg
-Pkg.add(PackageSpec("MriResearchTools"))
+Pkg.add("MriResearchTools")
 ```
 
 #### Usage
