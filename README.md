@@ -4,16 +4,19 @@
 
 ![test_clear_swi_github](https://user-images.githubusercontent.com/1307522/194285019-60e0e0a3-1bf5-4563-86bd-4201de2be08b.png)
 
-Apply CLEARSWI in the command line without Julia programming experience. This repository contains the CLEARSWI algorithm and a command line interface (previously [CLEARSWI.jl](https://github.com/korbinian90/CLEARSWI.jl)).
+Apply CLEARSWI in the command line without Julia programming experience. This repository contains the CLEARSWI algorithm and a command line interface.
 
 # Susceptibility Weighted Imaging (CLEAR-SWI)
+
 Published as [CLEAR-SWI](https://doi.org/10.1016/j.neuroimage.2021.118175). It provides magnetic resonance images with improved vein and iron contrast by weighting a combined magnitude image with a preprocessed phase image. This package has the additional capability of multi-echo SWI, intensity correction, contrast enhancement and improved phase processing. The reason for the development of this package was to solve artefacts at ultra-high field strength (7T), however, it also drastically improves the SWI quality at lower field strength.
 
 ## Download standalone executables
-https://github.com/korbinian90/CompileMRI.jl/releases  
-For usage help, run the command line program in `bin/clearswi` without arguments or see [below](https://github.com/korbinian90/CLEARSWI.jl/edit/master/README.md#command-line-help).
 
-## Usage - command line
+https://github.com/korbinian90/CompileMRI.jl/releases  
+This package contains binaries with dependencies.  
+For usage help, run the command line program in `bin/clearswi` without arguments or see [below](https://github.com/korbinian90/CLEARSWI.jl#command-line-help).
+
+## Usage - command line via Julia
 
 Install Julia 1.9 or newer (https://julialang.org)  
 Copy the file `clearswi.jl` from this repository to a convenient location. An alias for `clearswi` as `julia <path-to-file>/clearswi.jl` might be useful.
@@ -24,24 +27,27 @@ Copy the file `clearswi.jl` from this repository to a convenient location. An al
 
 On the first run, the dependencies will be installed automatically.
 
-For an extended explanation of the command line interface see [ROMEO](https://github.com/korbinian90/ROMEO)  
+For an extended explanation of the command line interface see [below](https://github.com/korbinian90/CLEARSWI).
 
 
 ## Usage - Julia
 
 ### Prerequisites
-A Julia installation ≥ 1.5 ([Official Julia Webpage](https://julialang.org/downloads/))
+
+A Julia installation ≥ 1.6 ([Official Julia Webpage](https://julialang.org/downloads/))
 
 Single-echo or multi-echo Magnitude and Phase images in NIfTI fileformat (4D images with echoes in the 4th dimension)
 
 ### Installing
+
 Run the following commands in Julia (either interactively in the REPL or as a script)
 
 ```julia
-import Pkg; Pkg.add(Pkg.PackageSpec(url="https://github.com/korbinian90/CLEARSWI.jl"))
+import Pkg; Pkg.add("CLEARSWI")
 ```
 
 ### Updating
+
 To update CLEARSWI to the newest version run
 
 ```julia
@@ -51,10 +57,13 @@ import Pkg; Pkg.update("CLEARSWI")
 and **restart Julia**.
 
 ### Function Reference
+
 https://korbinian90.github.io/CLEARSWI.jl/dev
 
 ### Usage
+
 This is a simple multi-echo case without changing default behavior
+
 ```julia
 using CLEARSWI
 
@@ -76,6 +85,7 @@ savenii(mip, "<outputpath>/mip.nii"; header=mag.header)
 ```
 
 ### Available Options
+
 To apply custom options use the following keyword syntax (example to apply 3D high-pass filtering for the phase with the given kernel size and deactivate softplus magnitude scaling):
 
 ```julia
@@ -84,6 +94,7 @@ swi = calculateSWI(data, options);
 ```
 
 All the possible options with the default values are
+
 ```julia
 mag_combine=:SNR
 mag_sens=nothing
@@ -94,14 +105,15 @@ phase_scaling_type=:tanh
 phase_scaling_strength=4
 writesteps=nothing
 ```
+
 * `mag_combine` selects the echo combination for the magnitude. Options are 
-    * `:SNR`
-    * `:average`
-    * `:last` to select the last echo
-    * `(:CNR => (:gm, :wm))` to optimize the contrast between two selected tissues with the possible tissues classes to select in `src\tissue.jl`, currently only working for 7T
-    * `(:echo => 3)` to select the 3rd echo 
-    * `(:closest => 15.3)` to select the echo that is closest to 15.3 ms 
-    * `(:SE => 15.3)` to simulate the contrast that would be achieved using a corresponding single-echo scan with 15.3 ms echo time.
+  * `:SNR`
+  * `:average`
+  * `:last` to select the last echo
+  * `(:CNR => (:gm, :wm))` to optimize the contrast between two selected tissues with the possible tissues classes to select in `src\tissue.jl`, currently only working for 7T
+  * `(:echo => 3)` to select the 3rd echo 
+  * `(:closest => 15.3)` to select the echo that is closest to 15.3 ms 
+  * `(:SE => 15.3)` to simulate the contrast that would be achieved using a corresponding single-echo scan with 15.3 ms echo time.
 
 * If `mag_sens` is set to an array, it is used instead of CLEAR-SWI sensitivity estimation. This can also be set to `mag_sens=[1]` to use the constant sensitivity of 1 and effectively avoid sensitivity correction.
 
@@ -118,16 +130,18 @@ writesteps=nothing
 * Set `writesteps` to the path, where intermediate steps should be saved, e.g. `writesteps="/tmp/clearswi_steps"`. If set to `nothing`, intermediate steps won't be saved.
 
 ### Calculating T2* and B0 maps on multi-echo datasets
+
 T2* and B0 maps can be calculated using the package [MriResearchTools](https://github.com/korbinian90/MriResearchTools.jl):
 
-#### Installing:
+#### Installing
 
 ```julia
 using Pkg
 Pkg.add(PackageSpec("MriResearchTools"))
 ```
 
-#### Usage:
+#### Usage
+
 With the previously defined variables `phase`, `mag` and `TEs`
 
 ```julia
@@ -141,7 +155,8 @@ r2s = r2s_from_t2s(t2s)
 ```
 
 ## Command Line Help
-```
+
+```plain
 $ .\bin\clearswi
 usage: <PROGRAM> [-m MAGNITUDE] [-p PHASE] [-o OUTPUT]
                  [-t ECHO-TIMES [ECHO-TIMES...]] [--qsm]
@@ -216,4 +231,5 @@ optional arguments:
 ```
 
 ## License
+
 This project is licensed under the MIT License - see the [LICENSE](https://github.com/korbinian90/CLEARSWI.jl/blob/master/LICENSE) for details
