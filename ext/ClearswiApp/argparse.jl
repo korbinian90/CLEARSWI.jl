@@ -21,7 +21,7 @@ function getargs(args::AbstractVector, version)
                 "3.5:3.5:14")."""
             nargs = '+'
         "--qsm"
-            help = """When activated uses QSM for phase weighting
+            help = """When activated uses TGV-QSM for phase weighting
             """
             action = :store_true
         "--mag-combine"

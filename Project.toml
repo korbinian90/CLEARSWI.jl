@@ -1,14 +1,13 @@
 name = "CLEARSWI"
 uuid = "06ae4d9b-ce5e-4813-a1b3-426e46312ec2"
 authors = ["Korbinian Eckstein"]
-version = "1.1.0"
+version = "1.2.0"
 
 [deps]
 ArgParse = "c7e460c6-2fb9-53a9-8c5b-16f535851c63"
 MriResearchTools = "557dad86-b9bd-4533-8525-1a39684d020f"
-QSM = "794fc106-2fa4-440f-961c-0d7d7b47016a"
+QuantitativeSusceptibilityMappingTGV = "bd393529-335a-4aed-902f-5de61cc7ff49"
 Statistics = "10745b16-79ce-11e8-11f9-7d13ad32a3b2"
-
 
 [weakdeps]
 ArgParse = "c7e460c6-2fb9-53a9-8c5b-16f535851c63"
@@ -18,6 +17,6 @@ ClearswiApp = "ArgParse"
 
 [compat]
 ArgParse = "1"
-MriResearchTools = "3.0"
-julia = "1.6"
-QSM = "0.4 - 0.5"
+MriResearchTools = "3.1"
+QuantitativeSusceptibilityMappingTGV = "0.2"
+julia = "1.7"

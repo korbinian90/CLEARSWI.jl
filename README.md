@@ -173,7 +173,7 @@ optional arguments:
                         The echo times are required for multi-echo
                         datasets specified in array or range syntax
                         (eg. "[1.5,3.0]" or "3.5:3.5:14").
-  --qsm                 When activated uses QSM for phase weighting
+  --qsm                 When activated uses TGV-QSM for phase weighting
   --mag-combine MAG-COMBINE [MAG-COMBINE...]
                         SNR | average | echo <n> | SE <te>. Magnitude
                         combination algorithm. echo <n> selects a

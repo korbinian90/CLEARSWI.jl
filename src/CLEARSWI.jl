@@ -1,7 +1,7 @@
 module CLEARSWI
 
 using MriResearchTools
-using QSM
+using QuantitativeSusceptibilityMappingTGV
 using Statistics
 
 include("tissue.jl")

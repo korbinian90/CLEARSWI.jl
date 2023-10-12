@@ -69,7 +69,7 @@ end
 function qsm_contrast(phase, mag, TEs, σ, vsz, save)
     mask = qsm_mask_filled(phase[:,:,:,1])
     save(mask, "qsm_mask")
-    combined = qsm_average(phase, mag, mask, TEs, vsz) # uses laplacian
+    combined = qsm_average(phase, mag, mask, TEs, vsz, B0=3) # uses laplacian
     save(combined, "qsm_average_laplacian")
     combined .-= gaussiansmooth3d(combined, σ; mask, dims=1:2)
     save(combined, "filteredphase")
