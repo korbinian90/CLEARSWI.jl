@@ -1,18 +1,20 @@
 using CLEARSWI
-using Test
-using Statistics
+using TestItemRunner
 
-@testset "CLEARSWI.jl" begin 
+@run_package_tests
+
+@testitem "CLEARSWI.jl" begin 
+    using Statistics
     @testset "Utils Tests" begin include("utility_test.jl") end
     @testset "Functions Test" begin include("functions_test.jl") end
     @testset "With FFTW Test" begin include("fftw_test.jl") end
 end
 
-@testset "ClearswiApp.jl" begin
+@testitem "ClearswiApp.jl" begin
     include("ClearswiApp.jl")
 end
 
-@testset "QSM" begin
+@testitem "QSM" begin
     include("qsm.jl")
 end
 

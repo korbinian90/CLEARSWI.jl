@@ -32,5 +32,3 @@ rm(file)
 try rm(tmp_folder) catch end
 
 @test isdir(CLEARSWI.dir("test", "data", "small"))
-
-printstyled("Tests Passed!"; color=:green)

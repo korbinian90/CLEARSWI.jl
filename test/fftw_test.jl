@@ -1,5 +1,5 @@
 # load data
-data_path = "data/small"
+data_path = CLEARSWI.dir("test", "data", "small")
 TEs = [4, 8, 12]
 
 mag_nii = readmag("$data_path/Mag.nii")

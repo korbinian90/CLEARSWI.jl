@@ -1,7 +1,7 @@
 using ArgParse
 
 original_path = abspath(".")
-p = abspath(joinpath("data", "small"))
+p = CLEARSWI.dir("test", "data", "small")
 tmpdir = mktempdir()
 cd(tmpdir)
 
