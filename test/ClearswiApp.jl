@@ -1,4 +1,4 @@
-using ArgParse
+using ArgParse, QSM
 
 original_path = abspath(".")
 p = CLEARSWI.dir("test", "data", "small")
