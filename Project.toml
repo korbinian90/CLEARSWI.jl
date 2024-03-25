@@ -17,4 +17,5 @@ ClearswiApp = "ArgParse"
 [compat]
 ArgParse = "1"
 MriResearchTools = "3.1"
+Statistics = "1"
 julia = "1.7"
