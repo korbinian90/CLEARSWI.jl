@@ -10,13 +10,13 @@ Apply CLEARSWI in the command line without Julia programming experience. This re
 
 Published as [CLEAR-SWI](https://doi.org/10.1016/j.neuroimage.2021.118175). It provides magnetic resonance images with improved vein and iron contrast by weighting a combined magnitude image with a preprocessed phase image. This package has the additional capability of multi-echo SWI, intensity correction, contrast enhancement and improved phase processing. The reason for the development of this package was to solve artefacts at ultra-high field strength (7T), however, it also drastically improves the SWI quality at lower field strength.
 
-## Download standalone executables
+## Option 1: Download standalone executables
 
 https://github.com/korbinian90/CompileMRI.jl/releases  
 This package contains binaries with dependencies.  
 For usage help, run the command line program in `bin/clearswi` without arguments or see [below](https://github.com/korbinian90/CLEARSWI.jl#command-line-help).
 
-## Usage - command line via Julia
+## Option 2: Usage - command line via Julia
 
 Install Julia 1.9 or newer (https://julialang.org)  
 Copy the file `clearswi.jl` from this repository to a convenient location. An alias for `clearswi` as `julia <path-to-file>/clearswi.jl` might be useful.
@@ -29,7 +29,7 @@ On the first run, the dependencies will be installed automatically.
 
 For an extended explanation of the command line interface see [below](https://github.com/korbinian90/CLEARSWI).
 
-## Usage - Julia
+## Option 3: Usage - Julia
 
 ### Prerequisites
 
