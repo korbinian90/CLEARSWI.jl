@@ -27,7 +27,7 @@ Copy the file `clearswi.jl` from this repository to a convenient location. An al
 
 On the first run, the dependencies will be installed automatically.
 
-For an extended explanation of the command line interface see [below]([https://github.com/korbinian90/CLEARSWI](https://github.com/korbinian90/CLEARSWI.jl#command-line-help)).
+For an extended explanation of the command line interface see [below](https://github.com/korbinian90/CLEARSWI.jl#command-line-help).
 
 ## Option 3: Usage - Julia
 
