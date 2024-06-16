@@ -47,6 +47,7 @@ options = [
     Options(mag_combine=:last) # 3
     Options(mag_softplus=false)
     Options(mag_sens=[1])
+    Options(mag_sens=(:sigma_mm => 3))
 ]
 # TODO
 wrong_options = [

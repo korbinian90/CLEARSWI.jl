@@ -13,7 +13,9 @@ end
 function sensitivity_correction(combined_mag, data, options)
     sensitivity = options.mag_sens
     if isnothing(sensitivity)
-        sensitivity = getsensitivity(data.mag[:,:,:,1], getpixdim(data))
+        sensitivity = getsensitivity(data.mag, getpixdim(data))
+    elseif sensitivity isa Pair && first(sensitivity) == :sigma_mm
+        sensitivity = getsensitivity(data.mag, getpixdim(data); sigma_mm=last(sensitivity))
     end
     savenii(sensitivity, "sensitivity", options.writesteps, data.header)
     return combined_mag ./ sensitivity

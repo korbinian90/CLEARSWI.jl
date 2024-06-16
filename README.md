@@ -105,7 +105,7 @@ qsm=false
   * `(:closest => 15.3)` to select the echo that is closest to 15.3 ms 
   * `(:SE => 15.3)` to simulate the contrast that would be achieved using a corresponding single-echo scan with 15.3 ms echo time.
 
-* If `mag_sens` is set to an array, it is used instead of CLEAR-SWI sensitivity estimation. This can also be set to `mag_sens=[1]` to use the constant sensitivity of 1 and effectively avoid sensitivity correction.
+* If `mag_sens` is set to an array, it is used instead of CLEAR-SWI sensitivity estimation. This can also be set to `mag_sens=[1]` to use the constant sensitivity of 1 and effectively avoid sensitivity correction. To change the sigma_mm value of the expected bias field size, set it to i.e. `mag_sens=(:sigma_mm => 7)`. The default is 7mm.
 
 * To deactivate scaling of the combined magnitude with the softplus function, use `mag_softplus=false`.
 
