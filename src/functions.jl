@@ -21,7 +21,6 @@ julia> swi = calculateSWI(data, options);
 ```
 """
 function calculateSWI(data::Data, options::Options=Options())
-    if !isnothing(options.writesteps) mkpath(options.writesteps) end
     getswimag(data, options) .* getswiphase(data, options)
 end
 

@@ -14,11 +14,14 @@ function CLEARSWI.clearswi_main(args; version="1.3.3")
     end
 
     mkpath(writedir)
+    if !isnothing(settings["writesteps"]) mkpath(settings["writesteps"]) end
+
     saveconfiguration(writedir, settings, args, version)
 
     mag = readmag(settings["magnitude"]; mmap=!settings["no-mmap"])
-    phase = readphase(settings["phase"]; mmap=(!settings["no-mmap"] && !settings["fix-ge-phase"]), rescale=!settings["no-phase-rescale"], fix_ge=settings["fix-ge-phase"])
     hdr = CLEARSWI.MriResearchTools.header(mag)
+    phase = readphase(settings["phase"]; mmap=(!settings["no-mmap"] && !settings["fix-ge-phase"]), rescale=!settings["no-phase-rescale"], fix_ge=settings["fix-ge-phase"])        
+    settings["fix-ge-phase"] && savenii(collect(phase), "corrected_GE_phase", settings["writesteps"], hdr)
     neco = size(mag, 4)
 
     ## Echoes for unwrapping
