@@ -1,4 +1,4 @@
-function CLEARSWI.clearswi_main(args; version="1.3")
+function CLEARSWI.clearswi_main(args; version="1.3.3")
     settings = getargs(args, version)
     if isnothing(settings) return end
     
@@ -17,7 +17,7 @@ function CLEARSWI.clearswi_main(args; version="1.3")
     saveconfiguration(writedir, settings, args, version)
 
     mag = readmag(settings["magnitude"]; mmap=!settings["no-mmap"])
-    phase = readphase(settings["phase"]; mmap=!settings["no-mmap"], rescale=!settings["no-phase-rescale"])
+    phase = readphase(settings["phase"]; mmap=(!settings["no-mmap"] && !settings["fix-ge-phase"]), rescale=!settings["no-phase-rescale"], fix_ge=settings["fix-ge-phase"])
     hdr = CLEARSWI.MriResearchTools.header(mag)
     neco = size(mag, 4)
 

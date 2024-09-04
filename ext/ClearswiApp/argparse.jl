@@ -71,6 +71,10 @@ function getargs(args::AbstractVector, version)
             help = """Deactivate automatic rescaling of phase images. By
                 default the input phase is rescaled to the range [-π;π]."""
             action = :store_true
+        "--fix-ge-phase"
+            help = """GE systems write corrupted phase output (slice jumps).
+                This option fixes the phase problems."""
+            action = :store_true
         "--writesteps"
             help = """Set to the path of a folder, if intermediate steps should
                 be saved."""

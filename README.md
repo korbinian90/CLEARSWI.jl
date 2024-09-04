@@ -18,22 +18,23 @@ For usage help, run the command line program in `bin/clearswi` without arguments
 
 ## Option 2: Usage - command line via Julia
 
-Install Julia 1.9 or newer (https://julialang.org)  
-Copy the file `clearswi.jl` from this repository to a convenient location. An alias for `clearswi` as `julia <path-to-file>/clearswi.jl` might be useful.
+*This option works on every system*
+
+1. Install the newest Julia version from the [Official Julia Webpage](https://julialang.org/)  
+2. Download the file [`clearswi.jl`](https://github.com/korbinian90/CLEARSWI.jl/blob/master/clearswi.jl) from this repository and save in a convenient location
+3. (optional) An alias for `clearswi` as `julia <path-to-file>/clearswi.jl` might be useful
 
 ```bash
     $ julia <path-to-file>/clearswi.jl -p phase.nii -m mag.nii -t [2.1,4.2,6.3] -o results
 ```
 
-On the first run, the dependencies will be installed automatically.
-
-For an extended explanation of the command line interface see [below](https://github.com/korbinian90/CLEARSWI.jl#command-line-help).
+On the first run, the dependencies will be installed automatically. For an extended explanation of the command line interface see [below](https://github.com/korbinian90/CLEARSWI.jl#command-line-help).
 
 ## Option 3: Usage - Julia
 
 ### Prerequisites
 
-A Julia installation ≥ 1.6 ([Official Julia Webpage](https://julialang.org/downloads/))
+A Julia installation ≥ 1.7 ([Official Julia Webpage](https://julialang.org/))
 
 Single-echo or multi-echo Magnitude and Phase images in NIfTI fileformat (4D images with echoes in the 4th dimension)
 
@@ -62,7 +63,7 @@ magfile = joinpath(nifti_folder, "Mag.nii") # Path to the magnitude image in nif
 phasefile = joinpath(nifti_folder, "Phase.nii") # Path to the phase image
 
 mag = readmag(magfile);
-phase = readphase(phasefile);
+phase = readphase(phasefile; fix_ge=true); # use `fix_ge=true` only for GE data with corrupted phase
 data = Data(mag, phase, mag.header, TEs);
 
 swi = calculateSWI(data);
@@ -152,19 +153,20 @@ r2s = r2s_from_t2s(t2s)
 
 ```plain
 $ .\bin\clearswi
-usage: <PROGRAM> [-m MAGNITUDE] [-p PHASE] [-o OUTPUT]
-                 [-t ECHO-TIMES [ECHO-TIMES...]] [--qsm]
-                 [--mag-combine MAG-COMBINE [MAG-COMBINE...]]
-                 [--mag-sensitivity-correction MAG-SENSITIVITY-CORRECTION]
-                 [--mag-softplus-scaling MAG-SOFTPLUS-SCALING]
-                 [--unwrapping-algorithm UNWRAPPING-ALGORITHM]
-                 [--filter-size FILTER-SIZE [FILTER-SIZE...]]
-                 [--phase-scaling-type PHASE-SCALING-TYPE]
-                 [--phase-scaling-strength PHASE-SCALING-STRENGTH]
-                 [-e ECHOES [ECHOES...]] [-N] [--no-phase-rescale]
-                 [--writesteps WRITESTEPS] [-v] [--version] [-h]
+usage: clearswi.jl [-m MAGNITUDE] [-p PHASE] [-o OUTPUT]
+                   [-t ECHO-TIMES [ECHO-TIMES...]] [--qsm]
+                   [--mag-combine MAG-COMBINE [MAG-COMBINE...]]
+                   [--mag-sensitivity-correction MAG-SENSITIVITY-CORRECTION]
+                   [--mag-softplus-scaling MAG-SOFTPLUS-SCALING]
+                   [--unwrapping-algorithm UNWRAPPING-ALGORITHM]
+                   [--filter-size FILTER-SIZE [FILTER-SIZE...]]
+                   [--phase-scaling-type PHASE-SCALING-TYPE]
+                   [--phase-scaling-strength PHASE-SCALING-STRENGTH]
+                   [-e ECHOES [ECHOES...]] [-N] [--no-phase-rescale]
+                   [--fix-ge-phase] [--writesteps WRITESTEPS] [-v]
+                   [--version] [-h]
 
-4.0.4
+1.3.3
 
 optional arguments:
   -m, --magnitude MAGNITUDE
@@ -176,13 +178,14 @@ optional arguments:
                         The echo times are required for multi-echo
                         datasets specified in array or range syntax
                         (eg. "[1.5,3.0]" or "3.5:3.5:14").
-  --qsm                 When activated uses RTS QSM for phase weighting
+  --qsm                 When activated uses RTS QSM for phase
+                        weighting.
   --mag-combine MAG-COMBINE [MAG-COMBINE...]
                         SNR | average | echo <n> | SE <te>. Magnitude
                         combination algorithm. echo <n> selects a
                         specific echo; SE <te> simulates a single echo
                         scan of the given echo time. (default:
-                        ["SNR"])
+                        Any["SNR"])
   --mag-sensitivity-correction MAG-SENSITIVITY-CORRECTION
                         <filename> | on | off. Use the CLEAR-SWI
                         sensitivity correction. Alternatively, a
@@ -198,7 +201,7 @@ optional arguments:
                         Size for the high-pass phase filter in voxels.
                         Can be given as <x> <y> <z> or in array syntax
                         (e.g. [2.2,3.1,0], which is effectively a 2D
-                        filter). (default: ["[4,4,0]"])
+                        filter). (default: Any["[4,4,0]"])
   --phase-scaling-type PHASE-SCALING-TYPE
                         tanh | negativetanh | positive | negative |
                         triangular Select the type of phase scaling.
@@ -210,12 +213,14 @@ optional arguments:
                         triangular phase scaling type. (default: "4")
   -e, --echoes ECHOES [ECHOES...]
                         Load only the specified echoes from disk
-                        (default: [":"])
+                        (default: Any[":"])
   -N, --no-mmap         Deactivate memory mapping. Memory mapping
                         might cause problems on network storage
   --no-phase-rescale    Deactivate automatic rescaling of phase
                         images. By default the input phase is rescaled
                         to the range [-π;π].
+  --fix-ge-phase        GE systems write corrupted phase output (slice
+                        jumps). This option fixes the phase problems.
   --writesteps WRITESTEPS
                         Set to the path of a folder, if intermediate
                         steps should be saved.
