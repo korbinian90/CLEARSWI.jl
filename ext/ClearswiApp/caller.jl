@@ -89,7 +89,7 @@ function CLEARSWI.clearswi_main(args; version="1.3.3")
     options = Options(;mag_combine, mag_sens, mag_softplus, phase_unwrap, phase_hp_sigma, phase_scaling_type, phase_scaling_strength, writesteps, qsm)
 
     swi = calculateSWI(data, options)
-    mip = createIntensityProjection(swi, minimum)
+    mip = createIntensityProjection(swi, minimum, settings["mip-slices"])
     
     savenii(swi, filename, writedir, hdr)
     savenii(mip, "mip", writedir, hdr)

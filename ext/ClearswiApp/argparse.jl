@@ -20,6 +20,9 @@ function getargs(args::AbstractVector, version)
                 specified in array or range syntax (eg. "[1.5,3.0]" or 
                 "3.5:3.5:14")."""
             nargs = '+'
+        "--mip-slices", "-s"
+            help = "The number of slices in the MIP image"
+            default = 7
         "--qsm"
             help = """When activated uses RTS QSM for phase weighting.
             """
