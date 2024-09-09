@@ -58,6 +58,7 @@ configurations_se(pm) = [
     [pm..., "-N"],
     [pm..., "--no-phase-rescale"],
     [pm..., "--writesteps", tmpdir],
+    [pm..., "--mip-slices", "3"],
 ]
 configurations_me(phasefile_me, magfile_me) = configurations_me(["-p", phasefile_me, "-m", magfile_me])
 configurations_me(pm) = [
