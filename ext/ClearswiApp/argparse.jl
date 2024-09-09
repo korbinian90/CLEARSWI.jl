@@ -22,7 +22,7 @@ function getargs(args::AbstractVector, version)
             nargs = '+'
         "--mip-slices", "-s"
             help = "The number of slices in the MIP image"
-            default = 7
+            default = "7"
         "--qsm"
             help = """When activated uses RTS QSM for phase weighting.
             """
