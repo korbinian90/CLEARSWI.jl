@@ -80,6 +80,6 @@ function saveconfiguration(options::Options, path=options.writesteps)
                 println(io, "$fname: " * string(val))
             end
         end
-        println(io, "CLEARSWI.jl github version-tag: " * pkgversion(CLEARSWI))
+        println(io, "CLEARSWI.jl github version-tag: $(pkgversion(CLEARSWI))")
     end
 end
