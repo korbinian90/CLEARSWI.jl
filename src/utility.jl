@@ -73,12 +73,13 @@ end
 Saves the configuration in the file "settings_swi.txt" under `path`
 """
 function saveconfiguration(options::Options, path=options.writesteps)
-    open(joinpath(path, "settings_swi.txt"), "w") do io
+    open(joinpath(path, "settings_swi.txt"), "w") do io        
         for fname in fieldnames(typeof(options))
             val = getfield(options, fname)
             if !(val isa AbstractArray && !(val isa Vector))
                 println(io, "$fname: " * string(val))
             end
         end
+        println(io, "CLEARSWI.jl github version-tag: " * pkgversion(CLEARSWI))
     end
 end
