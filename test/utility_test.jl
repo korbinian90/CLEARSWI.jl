@@ -25,6 +25,7 @@ phase_scaling_type: linear
 phase_scaling_strength: 4
 writesteps: tmp
 qsm: false
+CLEARSWI.jl github version-tag: $(pkgversion(CLEARSWI))
 """
 file = "$tmp_folder/settings_swi.txt"
 @test read(file, String) == text
