@@ -62,9 +62,10 @@ struct Options
     phase_scaling_strength::Real
     writesteps::Union{AbstractString, Nothing}
     qsm::Bool
+    qsm_mask::Union{AbstractArray, Nothing}
 end
-function Options(; mag_combine=:SNR, mag_sens=nothing, mag_softplus=true, phase_unwrap=:laplacian, phase_hp_sigma=[4,4,0], phase_scaling_type=:tanh, phase_scaling_strength=4, writesteps=nothing, qsm=false)
-    Options(mag_combine, mag_sens, mag_softplus, phase_unwrap, phase_hp_sigma, phase_scaling_type, phase_scaling_strength, writesteps, qsm)
+function Options(; mag_combine=:SNR, mag_sens=nothing, mag_softplus=true, phase_unwrap=:laplacian, phase_hp_sigma=[4,4,0], phase_scaling_type=:tanh, phase_scaling_strength=4, writesteps=nothing, qsm=false, qsm_mask=nothing)
+    Options(mag_combine, mag_sens, mag_softplus, phase_unwrap, phase_hp_sigma, phase_scaling_type, phase_scaling_strength, writesteps, qsm, qsm_mask)
 end
 
 """

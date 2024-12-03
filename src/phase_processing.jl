@@ -1,8 +1,7 @@
 function getswiphase(data, options)
     mask = robustmask(view(data.mag,:,:,:,1))
     savenii(mask, "maskforphase", options.writesteps, data.header)
-    # TODO output not readable
-    combined = getcombinedphase(data, options, mask)
+    combined = getcombinedphase(data, options, mask, options.qsm_mask)
     swiphase = createphasemask!(combined, mask, options.phase_scaling_type, options.phase_scaling_strength)
     savenii(swiphase, "swiphase", options.writesteps, data.header)
     return swiphase
@@ -42,7 +41,7 @@ function createphasemask!(swiphase, mask, phase_scaling_type, phase_scaling_stre
     return swiphase
 end
 
-function getcombinedphase(data, options, mask)
+function getcombinedphase(data, options, mask, qsm_mask)
     phase = data.phase
     mag = data.mag
     TEs = to_dim(data.TEs, 4)
@@ -51,7 +50,7 @@ function getcombinedphase(data, options, mask)
 
     if options.qsm
         vsz = data.header.pixdim[2:4]
-        return qsm_contrast(phase, mag, TEs, σ, vsz, save)
+        return qsm_contrast(phase, mag, TEs, qsm_mask, σ, vsz, save)
 
     elseif options.phase_unwrap == :laplacian
         return laplacian_combine(phase, mag, TEs, mask, σ, save)
@@ -66,8 +65,10 @@ function getcombinedphase(data, options, mask)
     error("Unwrapping $(options.phase_unwrap) ($(typeof(options.phase_unwrap))) not defined!")
 end
 
-function qsm_contrast(phase, mag, TEs, σ, vsz, save)
-    mask = qsm_mask_filled(phase[:,:,:,1])
+function qsm_contrast(phase, mag, TEs, mask, σ, vsz, save)
+    if isnothing(mask)
+        mask = qsm_mask_filled(phase[:,:,:,1])
+    end
     save(mask, "qsm_mask")
     combined = qsm_average(phase, mag, mask, TEs, vsz, B0=3) # uses laplacian
     save(combined, "qsm_average_laplacian")

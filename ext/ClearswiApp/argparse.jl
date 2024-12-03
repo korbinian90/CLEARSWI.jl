@@ -27,6 +27,10 @@ function getargs(args::AbstractVector, version)
             help = """When activated uses RTS QSM for phase weighting.
             """
             action = :store_true
+        "--qsm-mask"
+            help = """The mask used for QSM. Use a custom mask, if the qsm_mask.nii 
+                is not good for your data."""
+            default = nothing
         "--mag-combine"
             help = """SNR | average | echo <n> | SE <te>.
                 Magnitude combination algorithm. echo <n> selects a specific

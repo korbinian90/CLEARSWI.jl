@@ -85,8 +85,14 @@ function CLEARSWI.clearswi_main(args; version="1.3.3")
     phase_scaling_strength = try parse(Int, settings["phase-scaling-strength"]) catch; parse(Float32, settings["phase-scaling-strength"]) end
     writesteps = settings["writesteps"]
     qsm = settings["qsm"]
+    
+    if !isnothing(settings["qsm-mask"])
+        qsm_mask = readmag(settings["qsm-mask"]) .!= 0
+    else
+        qsm_mask = nothing
+    end
 
-    options = Options(;mag_combine, mag_sens, mag_softplus, phase_unwrap, phase_hp_sigma, phase_scaling_type, phase_scaling_strength, writesteps, qsm)
+    options = Options(;mag_combine, mag_sens, mag_softplus, phase_unwrap, phase_hp_sigma, phase_scaling_type, phase_scaling_strength, writesteps, qsm, qsm_mask=qsm_mask)
 
     swi = calculateSWI(data, options)
     mip = createIntensityProjection(swi, minimum, parse(Int, settings["mip-slices"]))
