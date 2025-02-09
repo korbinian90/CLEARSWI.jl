@@ -41,80 +41,78 @@ function createphasemask!(swiphase, mask, phase_scaling_type, phase_scaling_stre
     return swiphase
 end
 
-function getcombinedphase(data, options, mask, qsm_mask)
-    phase = data.phase
-    mag = data.mag
-    TEs = to_dim(data.TEs, 4)
-    σ = options.phase_hp_sigma
+function getcombinedphase(data, options, mask)
     save(image, name) = savenii(image, name, options.writesteps, data.header)
 
     if options.qsm
-        vsz = data.header.pixdim[2:4]
-        return qsm_contrast(phase, mag, TEs, qsm_mask, σ, vsz, save)
+        return qsm_contrast(data, options, save)
 
     elseif options.phase_unwrap == :laplacian
-        return laplacian_combine(phase, mag, TEs, mask, σ, save)
+        return laplacian_combine(data, options, mask, save)
 
     elseif options.phase_unwrap == :laplacianslice
-        return laplacianslice_combine(phase, mag, TEs, mask, σ, save)
+        return laplacianslice_combine(data, options, mask, save)
 
     elseif options.phase_unwrap == :romeo
-        return romeo_combine(phase, mag, TEs, mask, σ, save)
+        return romeo_combine(data, options, mask, save)
     end
 
     error("Unwrapping $(options.phase_unwrap) ($(typeof(options.phase_unwrap))) not defined!")
 end
 
-function qsm_contrast(phase, mag, TEs, mask, σ, vsz, save)
-    if isnothing(mask)
-        mask = qsm_mask_filled(phase[:,:,:,1])
-    end
-    save(mask, "qsm_mask")
+function qsm_contrast(data, options, save)
+    vsz = data.header.pixdim[2:4]
+    TEs = to_dim(data.TEs, 4)
+    mask = options.qsm_mask
+
     combined = qsm_average(phase, mag, mask, TEs, vsz, B0=3) # uses laplacian
     save(combined, "qsm_average_laplacian")
-    combined .-= gaussiansmooth3d(combined, σ; mask, dims=1:2)
+    combined .-= gaussiansmooth3d(combined, options.phase_hp_sigma; mask, dims=1:2)
     save(combined, "filteredphase")
     return combined
 end
 
-function laplacian_combine(phase, mag, TEs, mask, σ, save)
-    unwrapped = similar(phase)
-    for iEco in 1:size(phase, 4)
-        unwrapped[:,:,:,iEco] .= laplacianunwrap(view(phase,:,:,:,iEco))
+function laplacian_combine(data, options, mask, save)
+    TEs = to_dim(data.TEs, 4)
+    unwrapped = similar(data.phase)
+    for iEco in axes(data.phase, 4)
+        unwrapped[:,:,:,iEco] .= laplacianunwrap(view(data.phase,:,:,:,iEco))
     end
     save(unwrapped, "unwrappedphase")
 
-    for iEco in 1:size(phase, 4)
-        smoothed = gaussiansmooth3d(unwrapped[:,:,:,iEco], σ; mask, dims=1:3)
+    for iEco in axes(data.phase, 4)
+        smoothed = gaussiansmooth3d(unwrapped[:,:,:,iEco], options.phase_hp_sigma; mask, dims=1:3)
         unwrapped[:,:,:,iEco] .-= smoothed
     end
-    combined = combine_phase(unwrapped, mag, TEs)
+    combined = combine_phase(unwrapped, data.mag, TEs)
     save(unwrapped, "filteredphase")
     save(combined, "combinedphase")
     return combined
 end
 
-function laplacianslice_combine(phase, mag, TEs, mask, σ, save)
-    unwrapped = similar(phase)
-    for iEco in 1:size(phase, 4), iSlc in 1:size(phase, 3)
-        unwrapped[:,:,iSlc,iEco] .= laplacianunwrap(view(phase,:,:,iSlc,iEco))
-        smoothed = gaussiansmooth3d(unwrapped[:,:,iSlc,iEco], σ; mask=mask[:,:,iSlc], dims=1:2)
+function laplacianslice_combine(data, options, mask, save)
+    TEs = to_dim(data.TEs, 4)
+    unwrapped = similar(data.phase)
+    for iEco in axes(data.phase, 4), iSlc in axes(data.phase, 3)
+        unwrapped[:,:,iSlc,iEco] .= laplacianunwrap(view(data.phase,:,:,iSlc,iEco))
+        smoothed = gaussiansmooth3d(unwrapped[:,:,iSlc,iEco], options.phase_hp_sigma; mask=mask[:,:,iSlc], dims=1:2)
         unwrapped[:,:,iSlc,iEco] .-= smoothed
     end
-    combined = combine_phase(unwrapped, mag, TEs)
+    combined = combine_phase(unwrapped, data.mag, TEs)
     save(unwrapped, "unwrappedphase")
     save(combined, "combinedphase")
     return combined
 end
 
-function romeo_combine(phase, mag, TEs, mask, σ, save)
-    unwrapped = romeo(phase; mag, TEs)#, mask = mask)
+function romeo_combine(data, options, mask, save)
+    TEs = to_dim(data.TEs, 4)
+    unwrapped = romeo(data.phase; data.mag, TEs)#, mask = mask)
     save(unwrapped, "unwrappedphase")
 
-    combined = combine_phase(unwrapped, mag, TEs)
+    combined = combine_phase(unwrapped, data.mag, TEs)
     save(combined, "combinedphase")
 
-    combined .-= gaussiansmooth3d(combined, σ; mask, dims=1:2)
+    combined .-= gaussiansmooth3d(combined, options.phase_hp_sigma; mask, dims=1:2)
     save(combined, "filteredphase")
     return combined
 end
