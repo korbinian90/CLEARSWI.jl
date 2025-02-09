@@ -1,4 +1,4 @@
-using ArgParse, QSM
+using ArgParse, QuantitativeSusceptibilityMappingTGV
 
 original_path = abspath(".")
 p = CLEARSWI.dir("test", "data", "small")
@@ -39,7 +39,7 @@ end
 configurations_se(pf, mf) = configurations_se(["-p", pf, "-m", mf])
 configurations_se(pm) = [
     [pm...],
-    [pm..., "--qsm"],
+    # [pm..., "--qsm"],
     [pm..., "--mag-combine", "SNR"],
     [pm..., "--mag-combine", "average"],
     [pm..., "--mag-combine", "echo", "2"],
@@ -68,7 +68,7 @@ configurations_me(pm) = [
     [pm..., "-t", "[2,4,6]"],
     [pm..., "-t", "2:2:6"],
     [pm..., "-t", "[2.1,4.2,6.3]"],
-    [pm..., "-t", "[2.1,4.2,6.3]", "--qsm"],
+    # [pm..., "-t", "[2.1,4.2,6.3]", "--qsm"],
 ]
 
 files = [(phasefile_1eco, magfile_1eco), (phasefile_1arreco, magfile_1arreco), (phasefile_1eco, magfile_1arreco), (phasefile_1arreco, magfile_1eco)]

@@ -24,7 +24,7 @@ function getargs(args::AbstractVector, version)
             help = "The number of slices in the MIP image"
             default = "7"
         "--qsm"
-            help = """When activated uses RTS QSM for phase weighting.
+            help = """When activated uses TGV QSM for phase weighting.
             """
             action = :store_true
         "--qsm-mask"
