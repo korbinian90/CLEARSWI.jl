@@ -26,6 +26,7 @@ phase_scaling_strength: 4
 writesteps: tmp
 qsm: false
 qsm_mask: nothing
+gpu: nothing
 CLEARSWI.jl github version-tag: $(pkgversion(CLEARSWI))
 """
 file = "$tmp_folder/settings_swi.txt"
