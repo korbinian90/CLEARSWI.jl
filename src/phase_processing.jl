@@ -65,7 +65,7 @@ function qsm_contrast(data, options, save)
     TEs = to_dim(data.TEs, 4)
     mask = options.qsm_mask
 
-    combined = qsm_romeo_B0(data.phase, data.mag, mask, TEs, vsz, B0=3; gpu=options.gpu, save, iterations=800)
+    combined = qsm_romeo_B0(data.phase, data.mag, mask, TEs, vsz, B0=3; gpu=options.gpu, save, iterations=800, erosions=0)
     save(combined, "qsm_romeo_B0")
     combined .-= gaussiansmooth3d(combined, options.phase_hp_sigma; mask, dims=1:2)
     save(combined, "filteredphase")
