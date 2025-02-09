@@ -66,7 +66,7 @@ for o in options
 end
 
 # all results should be different
-for i in 1:length(s), j in 1:(i-1)
+for i in eachindex(s), j in 1:(i-1)
     @test s[i] != s[j]
     if s[i] == s[j]
         @show (i,j)

@@ -56,5 +56,5 @@ julia> createIntensityProjection(a, std)
 ```
 """
 function createIntensityProjection(S::AbstractArray{T,3}, func, d=7) where T
-    [func(S[x,y,z:z+d-1]) for x in 1:size(S,1), y in 1:size(S,2), z in 1:size(S,3)-d+1]
+    [func(S[x,y,z:z+d-1]) for x in axes(S,1), y in axes(S,2), z in 1:size(S,3)-d+1]
 end

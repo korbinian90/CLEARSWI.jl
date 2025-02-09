@@ -73,7 +73,7 @@ end
 
 function combine_weighted(mag, w)
     combined = zeros(size(mag)[1:3])
-    for ieco in 1:size(mag, 4)
+    for ieco in axes(mag, 4)
         combined .+= mag[:,:,:,ieco] .* w[ieco]
     end
     return combined ./ sum(w)
