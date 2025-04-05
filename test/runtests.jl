@@ -18,6 +18,10 @@ end
     include("qsm.jl")
 end
 
+@testitem "TGV QSM" begin
+    include("qsm_tgv.jl")
+end
+
 ## print version to verify
 println()
 clearswi_main(["--version"])

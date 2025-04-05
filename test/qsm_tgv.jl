@@ -1,4 +1,4 @@
-using QSM
+using QuantitativeSusceptibilityMappingTGV
 
 # load data
 data_path = CLEARSWI.dir("test", "data", "small")
