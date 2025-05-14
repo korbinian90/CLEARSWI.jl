@@ -27,6 +27,9 @@ function getargs(args::AbstractVector, version)
             help = """When activated uses TGV QSM for phase weighting.
             """
             action = :store_true
+        "--qsm-input"
+            help = "Give pre-calculated QSM instead of phase as input"
+            default = nothing
         "--qsm-mask"
             help = """The mask used for QSM. Use a custom mask, if the qsm_mask.nii 
                 is not good for your data."""

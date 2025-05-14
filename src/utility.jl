@@ -61,7 +61,7 @@ struct Options
     phase_scaling_type::Symbol
     phase_scaling_strength::Real
     writesteps::Union{AbstractString, Nothing}
-    qsm::Bool
+    qsm::Union{Bool, Symbol}
     qsm_mask::Union{AbstractArray, Nothing}
     gpu::Union{Module, Nothing}
 end

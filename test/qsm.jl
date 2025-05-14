@@ -11,3 +11,7 @@ data = Data(mag_nii, phase_nii, hdr, TEs)
 # QSM test
 qsm_run = calculateSWI(data, Options(qsm=true))
 @test qsm_run != calculateSWI(data)
+
+# QSM input test (phase in qsm)
+data = Data(mag_nii, phase_nii[:,:,:,1], hdr, TEs)
+qsm_run = calculateSWI(data, Options(qsm=:input))

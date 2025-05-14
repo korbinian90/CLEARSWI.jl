@@ -1,4 +1,4 @@
-function CLEARSWI.clearswi_main(args; version="1.3.3")
+function CLEARSWI.clearswi_main(args; version="1.6.0")
     settings = getargs(args, version)
     if isnothing(settings) return end
     
@@ -9,7 +9,7 @@ function CLEARSWI.clearswi_main(args; version="1.3.3")
         writedir = dirname(writedir)
     end
 
-    if endswith(settings["phase"], ".gz") || endswith(settings["magnitude"], ".gz")
+    if !isnothing(settings["phase"]) && (endswith(settings["phase"], ".gz") || endswith(settings["magnitude"], ".gz"))
         settings["no-mmap"] = true
     end
 
@@ -20,7 +20,14 @@ function CLEARSWI.clearswi_main(args; version="1.3.3")
 
     mag = readmag(settings["magnitude"]; mmap=!settings["no-mmap"])
     hdr = CLEARSWI.MriResearchTools.header(mag)
-    phase = readphase(settings["phase"]; mmap=(!settings["no-mmap"] && !settings["fix-ge-phase"]), rescale=!settings["no-phase-rescale"], fix_ge=settings["fix-ge-phase"])        
+    if isnothing(settings["qsm-input"])
+        phase = readphase(settings["phase"]; mmap=(!settings["no-mmap"] && !settings["fix-ge-phase"]), rescale=!settings["no-phase-rescale"], fix_ge=settings["fix-ge-phase"])
+        qsm = settings["qsm"]
+    else
+        # use qsm instead of phase
+        phase = readmag(settings["qsm-input"]; mmap=!settings["no-mmap"])
+        qsm = :input
+    end
     settings["fix-ge-phase"] && savenii(collect(phase), "corrected_GE_phase", settings["writesteps"], hdr)
     neco = size(mag, 4)
 
@@ -46,7 +53,11 @@ function CLEARSWI.clearswi_main(args; version="1.3.3")
     
     echoes = getechoes(settings, neco)
     if echoes != 1:neco
-        phase = phase[:,:,:,echoes]
+        if isnothing(settings["qsm-input"])
+            phase = phase[:,:,:,echoes]
+        else
+            phase = phase[:,:,:,1] # force 3D array for qsm-input
+        end
         mag = mag[:,:,:,echoes]
         settings["verbose"] && println("Selecting echoes $echoes")
     end
@@ -84,7 +95,6 @@ function CLEARSWI.clearswi_main(args; version="1.3.3")
     phase_scaling_type = Symbol(settings["phase-scaling-type"])
     phase_scaling_strength = try parse(Int, settings["phase-scaling-strength"]) catch; parse(Float32, settings["phase-scaling-strength"]) end
     writesteps = settings["writesteps"]
-    qsm = settings["qsm"]
     
     if !isnothing(settings["qsm-mask"])
         qsm_mask = readmag(settings["qsm-mask"]) .!= 0

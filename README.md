@@ -122,6 +122,8 @@ qsm=false
 
 * [Experimental] Set `qsm` to true to use QSM processing for the phase contrast. This requires the additional use of a QSM package. Supported are either [`QSM`](https://github.com/kamesy/QSM.jl) or [`QuantitativeSusceptibilityMappingTGV`](https://github.com/korbinian90/QuantitativeSusceptibilityMappingTGV.jl). Before setting this option, you need load one of these packages with `using`.
 
+* Set `qsm` to `:input` and use a pre-calculated QSM as `phase` input.
+
 ### Calculating T2* and B0 maps on multi-echo datasets
 
 T2* and B0 maps can be calculated using the package [MriResearchTools](https://github.com/korbinian90/MriResearchTools.jl):
@@ -154,7 +156,8 @@ r2s = r2s_from_t2s(t2s)
 ```plain
 $ .\bin\clearswi
 usage: clearswi.jl [-m MAGNITUDE] [-p PHASE] [-o OUTPUT]
-                   [-t ECHO-TIMES [ECHO-TIMES...]] [--qsm]
+                   [-t ECHO-TIMES [ECHO-TIMES...]] [-s MIP-SLICES]
+                   [--qsm] [--qsm-input QSM-INPUT] [--qsm-mask QSM-MASK]
                    [--mag-combine MAG-COMBINE [MAG-COMBINE...]]
                    [--mag-sensitivity-correction MAG-SENSITIVITY-CORRECTION]
                    [--mag-softplus-scaling MAG-SOFTPLUS-SCALING]
@@ -166,7 +169,7 @@ usage: clearswi.jl [-m MAGNITUDE] [-p PHASE] [-o OUTPUT]
                    [--fix-ge-phase] [--writesteps WRITESTEPS] [-v]
                    [--version] [-h]
 
-1.3.3
+1.6.0
 
 optional arguments:
   -m, --magnitude MAGNITUDE
@@ -178,8 +181,16 @@ optional arguments:
                         The echo times are required for multi-echo
                         datasets specified in array or range syntax
                         (eg. "[1.5,3.0]" or "3.5:3.5:14").
+  -s, --mip-slices MIP-SLICES
+                        The number of slices in the MIP image
+                        (default: "7")
   --qsm                 When activated uses TGV QSM for phase
                         weighting.
+  --qsm-input QSM-INPUT
+                        Give pre-calculated QSM instead of phase as
+                        input
+  --qsm-mask QSM-MASK   The mask used for QSM. Use a custom mask, if
+                        the qsm_mask.nii is not good for your data.
   --mag-combine MAG-COMBINE [MAG-COMBINE...]
                         SNR | average | echo <n> | SE <te>. Magnitude
                         combination algorithm. echo <n> selects a

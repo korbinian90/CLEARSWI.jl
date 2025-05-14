@@ -84,6 +84,8 @@ end
 
 test_clearswi(["-p", phasefile_1eco, "-m", magfile_1eco, "-t", "5"])
 #test_clearswi(["-p", phasefile_me_nan, "-m", magfile_me_nan_size, "-t", "[2,4]"])
+test_clearswi(["--qsm-input", phasefile_1eco, "-m", magfile_1eco])
+test_clearswi(["--qsm-input", phasefile_1arreco, "-m", magfile_1arreco, "-t", "5"])
 
 ## TODO: Test error and warning messages
 

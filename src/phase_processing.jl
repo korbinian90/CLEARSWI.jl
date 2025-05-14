@@ -44,7 +44,11 @@ end
 function getcombinedphase(data, options, mask)
     save(image, name) = savenii(image, name, options.writesteps, data.header)
 
-    if options.qsm
+    if options.qsm == :input
+        @assert size(data.phase, 4) == 1 "QSM input must be a single echo"
+        return high_pass_qsm(data.phase, options, mask, save)
+
+    elseif options.qsm
         return qsm_contrast(data, options, save)
 
     elseif options.phase_unwrap == :laplacian
@@ -64,12 +68,21 @@ function qsm_contrast(data, options, save)
     vsz = data.header.pixdim[2:4]
     TEs = to_dim(data.TEs, 4)
     mask = options.qsm_mask
+    
+    if isnothing(mask)
+        mask = qsm_mask_filled(data.phase[:,:,:,1])
+    end
 
     combined = qsm_romeo_B0(data.phase, data.mag, mask, TEs, vsz, B0=3; gpu=options.gpu, save, iterations=800, erosions=0)
     save(combined, "qsm_romeo_B0")
-    combined .-= gaussiansmooth3d(combined, options.phase_hp_sigma; mask, dims=1:2)
-    save(combined, "filteredphase")
+    combined = high_pass_qsm(combined, options, mask, save)
     return combined
+end
+
+function high_pass_qsm(qsm, options, mask, save)
+    qsm .-= gaussiansmooth3d(qsm, options.phase_hp_sigma; mask, dims=1:2)
+    save(qsm, "filteredphase")
+    return qsm
 end
 
 function laplacian_combine(data, options, mask, save)

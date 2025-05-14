@@ -1,15 +1,12 @@
 name = "CLEARSWI"
 uuid = "06ae4d9b-ce5e-4813-a1b3-426e46312ec2"
 authors = ["Korbinian Eckstein"]
-version = "1.5.1"
+version = "1.6.0"
 
 [deps]
 ArgParse = "c7e460c6-2fb9-53a9-8c5b-16f535851c63"
 MriResearchTools = "557dad86-b9bd-4533-8525-1a39684d020f"
 Statistics = "10745b16-79ce-11e8-11f9-7d13ad32a3b2"
-
-[weakdeps]
-ArgParse = "c7e460c6-2fb9-53a9-8c5b-16f535851c63"
 
 [extensions]
 ClearswiApp = "ArgParse"
