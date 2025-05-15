@@ -122,7 +122,7 @@ qsm=false
 
 * [Experimental] Set `qsm` to true to use QSM processing for the phase contrast. This requires the additional use of a QSM package. Supported are either [`QSM`](https://github.com/kamesy/QSM.jl) or [`QuantitativeSusceptibilityMappingTGV`](https://github.com/korbinian90/QuantitativeSusceptibilityMappingTGV.jl). Before setting this option, you need load one of these packages with `using`.
 
-* Set `qsm` to `:input` and use a pre-calculated QSM as `phase` input.
+* [Experimental] Set `qsm` to `:input` and use a pre-calculated QSM instead of a `phase` input. This needs additional fine-tuning. Since most large fluctuations are removed in QSM, the filtering should be set to a larger kernel (e.g. `phase_hp_sigma=[20,20,0]`) and the strength might need to be adjusted to something in the range of `phase_scaling_strength=0.04`.
 
 ### Calculating T2* and B0 maps on multi-echo datasets
 
