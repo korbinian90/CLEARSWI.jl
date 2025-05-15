@@ -188,7 +188,9 @@ optional arguments:
                         weighting.
   --qsm-input QSM-INPUT
                         Give pre-calculated QSM instead of phase as
-                        input
+                        input. Not fine-tuned! Please adjust phase
+                        filter to something like: "--filter-size
+                        [20,20,0] --phase-phase_scaling_strength 0.04"
   --qsm-mask QSM-MASK   The mask used for QSM. Use a custom mask, if
                         the qsm_mask.nii is not good for your data.
   --mag-combine MAG-COMBINE [MAG-COMBINE...]

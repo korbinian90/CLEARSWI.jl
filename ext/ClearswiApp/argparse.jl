@@ -28,7 +28,9 @@ function getargs(args::AbstractVector, version)
             """
             action = :store_true
         "--qsm-input"
-            help = "Give pre-calculated QSM instead of phase as input"
+            help = """Give pre-calculated QSM instead of phase as input. Not fine-tuned!
+                Please adjust phase filter to something like:
+                "--filter-size [20,20,0] --phase-phase_scaling_strength 0.04" """
             default = nothing
         "--qsm-mask"
             help = """The mask used for QSM. Use a custom mask, if the qsm_mask.nii 

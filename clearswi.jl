@@ -3,7 +3,12 @@ Pkg.activate(@__DIR__)
 try
     using CLEARSWI, QuantitativeSusceptibilityMappingTGV, ArgParse
 catch
-    Pkg.add(["CLEARSWI", "QuantitativeSusceptibilityMappingTGV", "ArgParse"])
+    try
+        Pkg.add("CLEARSWI")
+    catch LoadError
+        println("Skipping CLEARSWI installation, probably local directory used.")
+    end
+    Pkg.add(["QuantitativeSusceptibilityMappingTGV", "ArgParse"])
     using CLEARSWI, QuantitativeSusceptibilityMappingTGV, ArgParse
 end
 
