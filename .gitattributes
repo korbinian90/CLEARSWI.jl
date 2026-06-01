@@ -1,0 +1,15 @@
+# Normalize line endings: detect text files and check them out as LF on all
+# platforms. Without this, files round-trip through Windows with CRLF and
+# every `git status` shows a phantom dirty tree.
+* text=auto eol=lf
+
+# Binary file types - never modify.
+*.png binary
+*.jpg binary
+*.jpeg binary
+*.gif binary
+*.ico binary
+*.pdf binary
+*.zip binary
+*.gz binary
+*.nii binary

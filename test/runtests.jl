@@ -3,11 +3,15 @@ using TestItemRunner
 
 @run_package_tests
 
-@testitem "CLEARSWI.jl" begin 
+@testitem "CLEARSWI.jl" begin
     using Statistics
     @testset "Utils Tests" begin include("utility_test.jl") end
     @testset "Functions Test" begin include("functions_test.jl") end
     @testset "With FFTW Test" begin include("fftw_test.jl") end
+end
+
+@testitem "Phase unwrap kernel" begin
+    include("phase_unwrap_kernel_test.jl")
 end
 
 @testitem "ClearswiApp.jl" begin

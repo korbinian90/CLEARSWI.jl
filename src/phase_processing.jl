@@ -85,11 +85,31 @@ function high_pass_qsm(qsm, options, mask, save)
     return qsm
 end
 
+function _laplacian_unwrap_func(options)
+    kind = options.phase_unwrap_kernel
+    if kind === :dct
+        return p -> laplacianunwrap(p)
+    elseif kind === :fft
+        # TODO(z_weight): laplacianunwrap_fft defaults to z_weight=1 (isotropic z
+        # coupling), which over-weights the through-slice term for anisotropic
+        # thick-slice SWI. The geometry-optimal weight is (in-plane/slice spacing)^2
+        # = (pixdim_xy/pixdim_z)^2 (~0.06-0.16 for typical SWI; only the in-plane:z
+        # ratio matters, the operator scale cancels in the unwrap). To wire it up,
+        # thread pixdim from data.header into here and call laplacianunwrap_fft(p, zw).
+        # Irrelevant for the 2D :laplacianslice ICE-parity path. Validate z_weight in
+        # {0, auto, 1} on real anisotropic data before changing the default.
+        return p -> laplacianunwrap_fft(p)
+    else
+        error("phase_unwrap_kernel must be :dct or :fft, got $kind")
+    end
+end
+
 function laplacian_combine(data, options, mask, save)
     TEs = to_dim(data.TEs, 4)
+    unwrap_func = _laplacian_unwrap_func(options)
     unwrapped = similar(data.phase)
     for iEco in axes(data.phase, 4)
-        unwrapped[:,:,:,iEco] .= laplacianunwrap(view(data.phase,:,:,:,iEco))
+        unwrapped[:,:,:,iEco] .= unwrap_func(view(data.phase,:,:,:,iEco))
     end
     save(unwrapped, "unwrappedphase")
 
@@ -105,9 +125,10 @@ end
 
 function laplacianslice_combine(data, options, mask, save)
     TEs = to_dim(data.TEs, 4)
+    unwrap_func = _laplacian_unwrap_func(options)
     unwrapped = similar(data.phase)
     for iEco in axes(data.phase, 4), iSlc in axes(data.phase, 3)
-        unwrapped[:,:,iSlc,iEco] .= laplacianunwrap(view(data.phase,:,:,iSlc,iEco))
+        unwrapped[:,:,iSlc,iEco] .= unwrap_func(view(data.phase,:,:,iSlc,iEco))
         smoothed = gaussiansmooth3d(unwrapped[:,:,iSlc,iEco], options.phase_hp_sigma; mask=mask[:,:,iSlc], dims=1:2)
         unwrapped[:,:,iSlc,iEco] .-= smoothed
     end

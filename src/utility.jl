@@ -51,6 +51,8 @@ end
 * Set `writesteps` to the path, where intermediate steps should be saved, e.g. `writesteps="/tmp/clearswi_steps"`. If set to `nothing`, intermediate steps won't be saved.
 
 * Set `qsm` to true
+
+* `phase_unwrap_kernel` selects which Laplacian discretisation is used for `phase_unwrap=:laplacian` or `:laplacianslice`. `:dct` (default) uses MriResearchTools' Schofield-Zhu DCT formulation (mirror boundaries, continuous Laplacian); `:fft` uses a discrete 5-/7-point Laplacian stencil applied in k-space (periodic boundaries), following the Bilgic reference. On in-vivo data the two differ noticeably near brain boundaries. For parity with the ICE pipeline use `:fft` together with `phase_unwrap=:laplacianslice`: ICE unwraps slice-by-slice in-plane (no through-slice coupling) on both its FFT and DCT backends, so the 2D slicewise stencil matches it, whereas the 3D `:laplacian` path couples z isotropically (`z_weight=1`) and does not reproduce ICE's FFT functor.
 """
 struct Options
     mag_combine
@@ -64,9 +66,10 @@ struct Options
     qsm::Union{Bool, Symbol}
     qsm_mask::Union{AbstractArray, Nothing}
     gpu::Union{Module, Nothing}
+    phase_unwrap_kernel::Symbol
 end
-function Options(; mag_combine=:SNR, mag_sens=nothing, mag_softplus=true, phase_unwrap=:laplacian, phase_hp_sigma=[4,4,0], phase_scaling_type=:tanh, phase_scaling_strength=4, writesteps=nothing, qsm=false, qsm_mask=nothing, gpu=nothing)
-    Options(mag_combine, mag_sens, mag_softplus, phase_unwrap, phase_hp_sigma, phase_scaling_type, phase_scaling_strength, writesteps, qsm, qsm_mask, gpu)
+function Options(; mag_combine=:SNR, mag_sens=nothing, mag_softplus=true, phase_unwrap=:laplacian, phase_hp_sigma=[4,4,0], phase_scaling_type=:tanh, phase_scaling_strength=4, writesteps=nothing, qsm=false, qsm_mask=nothing, gpu=nothing, phase_unwrap_kernel=:dct)
+    Options(mag_combine, mag_sens, mag_softplus, phase_unwrap, phase_hp_sigma, phase_scaling_type, phase_scaling_strength, writesteps, qsm, qsm_mask, gpu, phase_unwrap_kernel)
 end
 
 """
