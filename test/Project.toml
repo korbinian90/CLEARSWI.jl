@@ -1,7 +1,14 @@
 [deps]
 ArgParse = "c7e460c6-2fb9-53a9-8c5b-16f535851c63"
+FFTW = "7a1cc6ca-52ef-59f5-83cd-3a7055c09341"
 QSM = "794fc106-2fa4-440f-961c-0d7d7b47016a"
 QuantitativeSusceptibilityMappingTGV = "bd393529-335a-4aed-902f-5de61cc7ff49"
 Statistics = "10745b16-79ce-11e8-11f9-7d13ad32a3b2"
 Test = "8dfed614-e22c-5e08-85e1-65c5234f0b40"
 TestItemRunner = "f8b46487-2199-4994-9208-9a1283c18c0a"
+
+[compat]
+# QSM v0.5.4 calls FFTW.libfftw3[], which breaks on FFTW >= 1.9 where
+# libfftw3 is no longer a Ref{String}. Cap FFTW until kamesy/QSM.jl#13
+# (FFTW = "1.6 - 1.8") is merged and registered as QSM 0.5.5.
+FFTW = "1.6 - 1.8"
