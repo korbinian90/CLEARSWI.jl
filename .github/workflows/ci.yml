@@ -24,28 +24,28 @@ jobs:
         arch:
           - x64
     steps:
-      - uses: actions/checkout@v4
-      - uses: julia-actions/setup-julia@v2
+      - uses: actions/checkout@34e114876b0b11c390a56381ad16ebd13914f8d5 # v4
+      - uses: julia-actions/setup-julia@4c0cb0fce8556fdb04a90347310e5db8b1f98fb9 # v2
         with:
           version: ${{ matrix.version }}
           arch: ${{ matrix.arch }}
-      - uses: julia-actions/cache@v2
-      - uses: julia-actions/julia-buildpkg@v1
-      - uses: julia-actions/julia-runtest@v1
-      - uses: julia-actions/julia-processcoverage@v1
-      - uses: codecov/codecov-action@v4
+      - uses: julia-actions/cache@d10a6fd8f31b12404a54613ebad242900567f2b9 # v2
+      - uses: julia-actions/julia-buildpkg@e3eb439fad4f9aba7da2667e7510e4a46ebc46e1 # v1
+      - uses: julia-actions/julia-runtest@d60b785c6f2bdf4ebfb18b2b6f7d93b7dfb0efe3 # v1
+      - uses: julia-actions/julia-processcoverage@03114f09f119417c3242a9fb6e0b722676aedf38 # v1
+      - uses: codecov/codecov-action@b9fd7d16f6d7d1b5d2bec1a2887e65ceed900238 # v4
         with:
           files: lcov.info
   docs:
     name: Documentation
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v4
-      - uses: julia-actions/setup-julia@v2
+      - uses: actions/checkout@34e114876b0b11c390a56381ad16ebd13914f8d5 # v4
+      - uses: julia-actions/setup-julia@4c0cb0fce8556fdb04a90347310e5db8b1f98fb9 # v2
         with:
           version: '1'
-      - uses: julia-actions/julia-buildpkg@v1
-      - uses: julia-actions/julia-docdeploy@v1
+      - uses: julia-actions/julia-buildpkg@e3eb439fad4f9aba7da2667e7510e4a46ebc46e1 # v1
+      - uses: julia-actions/julia-docdeploy@e62cc8fd639797a0c2922a437d5b1b81c4a12787 # v1
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
           DOCUMENTER_KEY: ${{ secrets.DOCUMENTER_KEY }}
