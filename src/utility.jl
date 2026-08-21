@@ -72,10 +72,16 @@ end
 """
     saveconfiguration(options::Options, path=options.writesteps)
 
-Saves the configuration in the file "settings_swi.txt" under `path`
+Saves the configuration in "settings_swi.txt" and the references for the methods
+this configuration actually uses in "citations_swi.txt", both under `path`.
 """
 function saveconfiguration(options::Options, path=options.writesteps)
-    open(joinpath(path, "settings_swi.txt"), "w") do io        
+    open(joinpath(path, "settings_swi.txt"), "w") do io
+        println(io, "# CLEARSWI $(pkgversion(CLEARSWI))")
+        println(io, "# julia: $VERSION")
+        println(io, "# MriResearchTools: $(pkgversion(MriResearchTools))")
+        println(io, "# ROMEO: $(pkgversion(MriResearchTools.ROMEO))")
+        println(io)
         for fname in fieldnames(typeof(options))
             val = getfield(options, fname)
             if !(val isa AbstractArray && !(val isa Vector))
@@ -83,5 +89,40 @@ function saveconfiguration(options::Options, path=options.writesteps)
             end
         end
         println(io, "CLEARSWI.jl github version-tag: $(pkgversion(CLEARSWI))")
+    end
+    write_citations_swi(options, path)
+end
+
+# The steps folder is often the only thing that travels with a result, so the
+# references for what produced it belong next to the settings that produced it.
+function write_citations_swi(options::Options, path)
+    cite = [:clearswi]
+    if isnothing(options.mag_sens) || options.mag_sens isa Pair
+        push!(cite, :homogeneity) # sensitivity was estimated rather than supplied
+    end
+    if options.qsm === true
+        append!(cite, [:tgv, :tgv_original, :romeo, :aspire])
+    elseif options.phase_unwrap === :romeo
+        push!(cite, :romeo)
+    elseif startswith(String(options.phase_unwrap), "laplacian")
+        push!(cite, :laplacian)
+    end
+
+    open(joinpath(path, "citations_swi.txt"), "w") do io
+        println(io, "# Citations for the methods this configuration actually used.")
+        println(io, "# Methods that were available but not used are deliberately absent.")
+        println(io)
+        for k in unique(cite)
+            println(io, MriResearchTools.CITATIONS[k])
+            println(io)
+        end
+        for k in unique(cite)
+            if haskey(MriResearchTools.NOTICES, k)
+                println(io, "# Notices for the methods used:")
+                println(io)
+                println(io, MriResearchTools.NOTICES[k])
+                println(io)
+            end
+        end
     end
 end

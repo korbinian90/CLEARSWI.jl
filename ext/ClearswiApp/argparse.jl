@@ -145,61 +145,34 @@ function getTEs(settings, neco, echoes)
 end
 
 function saveconfiguration(writedir, settings, args, version)
-    writedir = abspath(writedir)
-    open(joinpath(writedir, "settings_clearswi.txt"), "w") do io
-        for (fname, val) in settings
-            if !(typeof(val) <: AbstractArray)
-                println(io, "$fname: " * string(val))
-            end
-        end
-        println(io, """Arguments: $(join(args, " "))""")
-        println(io, "ClearswiApp version: $version")
+    # Cite only what this run used.
+    cite = [:clearswi]
+    if settings["mag-sensitivity-correction"] == "on"
+        push!(cite, :homogeneity)
     end
-    open(joinpath(writedir, "citations_clearswi.txt"), "w") do io
-        println(io, "# For the algorithms used, please cite:")
-        println(io)
-        println(io, """Eckstein, K., Bachrata, B., Hangel, G., Widhalm, G., Enzinger, C., Barth, M., Trattnig, S., Robinson, S.D., 2021.
-                    Improved susceptibility weighted imaging at ultra-high field using bipolar multi-echo acquisition and optimized image processing: CLEAR-SWI.
-                    NeuroImage 237, 118175
-                    https://doi.org/10.1016/j.neuroimage.2021.118175""")
-        println(io)
-
-        if settings["mag-sensitivity-correction"] == "on"
-            println(io, """Eckstein, K., Trattnig, S., Robinson, S.D., 2019.
-                        A Simple Homogeneity Correction for Neuroimaging at 7T
-                        Proceedings of the 27th Annual Meeting ISMRM. Presented at the ISMRM, Montréal, Québec, Canada.
-                        https://index.mirasmart.com/ISMRM2019/PDFfiles/2716.html""")
-            println(io)
-        end
-
-        if settings["unwrapping-algorithm"] == "romeo"
-            println(io, """Dymerska, B., Eckstein, K., Bachrata, B., Siow, B., Trattnig, S., Shmueli, K., Robinson, S.D., 2020.
-                        Phase Unwrapping with a Rapid Opensource Minimum Spanning TreE AlgOrithm (ROMEO).
-                        Magnetic Resonance in Medicine.
-                        https://doi.org/10.1002/mrm.28563""")
-            println(io)
-        elseif contains(settings["unwrapping-algorithm"], "laplacian")
-            println(io, """Schofield, M.A., Zhu, Y., 2003.
-                        Fast phase unwrapping algorithm for interferometric applications.
-                        Optics Letters 28, 1194-1196.
-                        https://doi.org/10.1364/OL.28.001194""")
-            println(io)
-        end
-
-        if settings["qsm"]
-            println(io, """Kames, C., Wiggermann, V., Rauscher, A., 2018.
-                        Rapid two-step dipole inversion for susceptibility mapping with sparsity priors.
-                        NeuroImage 167, 276-286.
-                        https://doi.org/10.1016/j.neuroimage.2017.11.018""")
-            println(io)
-        end
-        
-        println(io)
-        println(io, "# Optional citations:")
-        println(io)
-        println(io, """Bezanson, J., Edelman, A., Karpinski, S., Shah, V.B., 2017.
-                    Julia: A fresh approach to numerical computing
-                    SIAM Review 59, 65--98
-                    https://doi.org/10.1137/141000671""")
+    if settings["unwrapping-algorithm"] == "romeo"
+        push!(cite, :romeo)
+    elseif contains(settings["unwrapping-algorithm"], "laplacian")
+        push!(cite, :laplacian)
     end
+    if settings["qsm"] === true && isnothing(settings["qsm-input"])
+        # The QSM path goes through QuantitativeSusceptibilityMappingTGV, which is
+        # what the compiled app depends on. It used to cite the RTS dipole
+        # inversion of QSM.jl, which this tool does not run. With --qsm-input the
+        # user supplies a finished map, so nothing is cited for it here.
+        append!(cite, [:tgv, :tgv_original])
+        # qsm_romeo_B0 unwraps with ROMEO, and removes phase offsets with
+        # MCPC-3D-S first when there is more than one echo.
+        push!(cite, :romeo)
+        if get(settings, "number-of-echoes", 1) > 1
+            push!(cite, :aspire)
+        end
+    end
+
+    write_provenance(writedir, "clearswi";
+        version, args, settings, cite,
+        optional = [:julia],
+        inputs = ["magnitude" => settings["magnitude"], "phase" => settings["phase"]],
+        packages = [CLEARSWI, MriResearchTools, MriResearchTools.ROMEO],
+    )
 end
