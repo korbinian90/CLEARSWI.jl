@@ -113,14 +113,15 @@ function write_citations_swi(options::Options, path)
         println(io, "# Methods that were available but not used are deliberately absent.")
         println(io)
         for k in unique(cite)
-            println(io, MriResearchTools.CITATIONS[k])
+            haskey(CITATIONS, k) || continue
+            println(io, CITATIONS[k])
             println(io)
         end
         for k in unique(cite)
-            if haskey(MriResearchTools.NOTICES, k)
+            if haskey(NOTICES, k)
                 println(io, "# Notices for the methods used:")
                 println(io)
-                println(io, MriResearchTools.NOTICES[k])
+                println(io, NOTICES[k])
                 println(io)
             end
         end
