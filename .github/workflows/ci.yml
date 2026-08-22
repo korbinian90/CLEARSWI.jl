@@ -11,10 +11,6 @@ jobs:
   test:
     name: Julia ${{ matrix.version }} - ${{ matrix.os }} - ${{ matrix.arch }} - ${{ github.event_name }}
     runs-on: ${{ matrix.os }}
-    # 'nightly' tracks unreleased Julia, so a failure there is upstream breakage
-    # rather than a defect in this package. The job still runs and still reports,
-    # but it no longer fails the workflow run.
-    continue-on-error: ${{ matrix.version == 'nightly' }}
     strategy:
       fail-fast: false
       matrix:
@@ -22,7 +18,12 @@ jobs:
           - 'min'
           - 'lts'
           - '1'
-          - 'nightly'
+          # 'nightly' is deliberately absent. A failure there is upstream
+          # breakage in unreleased Julia, not a defect here, but the check run
+          # for the job still reports its own failure even with
+          # continue-on-error, so every pull request read as broken. Measured on
+          # ROMEO.jl#21: run conclusion success, nightly job conclusion failure,
+          # red X in the checks list.
         os:
           - ubuntu-latest
         arch:
