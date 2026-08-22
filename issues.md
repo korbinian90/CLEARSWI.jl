@@ -62,6 +62,44 @@ twice, and the largest measured ICE improvement (-65% ring artefact) has been
 stranded unmerged since June. Gated on the public/private decision (X7.1), not
 on engineering. The cost accrues while it waits.
 
+### C2b. The --qsm path writes NaN into the SWI
+
+Measured on the bundled test data with the TGV backend: `calculateSWI(data,
+Options(qsm=true))` returns 50 NaN of 32000 voxels (0.16%). Plain
+`calculateSWI(data)` returns none.
+
+Localised. `qsm_romeo_B0` is clean. `high_pass_qsm` (`src/phase_processing.jl`)
+then does
+
+    qsm .-= gaussiansmooth3d(qsm, options.phase_hp_sigma; mask, dims=1:2)
+
+and the masked smoother returns NaN wherever an in-plane window contains no
+masked voxel at all (0/0). All 50 NaN sit **outside** the QSM mask - but the
+subtraction covers the whole array, so they propagate into `filteredphase`,
+`swiphase` and the final SWI. They are not background air: the magnitude at
+those voxels averages 45% of the image maximum and peaks at 56%, because
+`qsm_mask_filled` is derived from phase quality and excludes voxels that carry
+real signal.
+
+Recorded as `@test_broken` in `test/qsm_tgv.jl`, not fixed. Two candidate fixes -
+confine the subtraction to the mask, or give the masked smoother a no-support
+fallback - both change numbers in a shipped path, and the second one lives in
+MriResearchTools and would affect every caller of `gaussiansmooth3d`.
+
+Found only because the QSM test item was given real assertions while dropping
+QSM.jl from the test environment. The previous test asserted
+`qsm_run != calculateSWI(data)`, which NaN satisfies.
+
+### C2c. QSM.jl dropped from the test environment, backend demoted
+
+`test/qsm.jl` is gone and `QSM` is out of `test/Project.toml`: CLEARSWI never
+called QSM.jl, and the item was a byte-for-byte duplicate of the TGV one except
+for which backend it imported - which, given M1, may not even have decided who
+answered. This also removes the reason for the FFTW pin proposed in PR #21.
+MriResearchTools now documents TGV as the supported backend and QSM.jl as not
+recommended. The FFTW cap in MriResearchTools stays until the upstream question
+is settled with Ashley Stewart and Steffen Bollmann.
+
 ### C3. F10 - abstract and untyped public API
 `src/utility.jl:1-70`. `Data` holds `mag::AbstractArray`, an untyped header and
 `TEs::AbstractVector`; `Options` has eleven fields, most untyped or `Union`-typed.
