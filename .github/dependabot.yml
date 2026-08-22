@@ -3,4 +3,11 @@ updates:
   - package-ecosystem: "github-actions"
     directory: "/"
     schedule:
-      interval: "weekly"
+      interval: "monthly"
+    groups:
+      # One pull request per month for all action bumps, instead of one per
+      # action. Ungrouped weekly updates produced five or more open pull
+      # requests per repository that nobody triaged.
+      github-actions:
+        patterns:
+          - "*"
