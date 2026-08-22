@@ -108,22 +108,8 @@ function write_citations_swi(options::Options, path)
         push!(cite, :laplacian)
     end
 
-    open(joinpath(path, "citations_swi.txt"), "w") do io
-        println(io, "# Citations for the methods this configuration actually used.")
-        println(io, "# Methods that were available but not used are deliberately absent.")
-        println(io)
-        for k in unique(cite)
-            haskey(CITATIONS, k) || continue
-            println(io, CITATIONS[k])
-            println(io)
-        end
-        for k in unique(cite)
-            if haskey(NOTICES, k)
-                println(io, "# Notices for the methods used:")
-                println(io)
-                println(io, NOTICES[k])
-                println(io)
-            end
-        end
-    end
+    # One writer for the whole family, so the steps folder gets the same warning
+    # about an unregistered citation that the CLIs get, instead of skipping it
+    # silently, and the notices header is printed once rather than per notice.
+    write_citations(path, "swi"; cite)
 end
