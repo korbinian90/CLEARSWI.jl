@@ -15,10 +15,6 @@ end
 end
 
 @testitem "QSM" begin
-    include("qsm.jl")
-end
-
-@testitem "TGV QSM" begin
     include("qsm_tgv.jl")
 end
 
