@@ -30,8 +30,24 @@ gpu: nothing
 CLEARSWI.jl github version-tag: $(pkgversion(CLEARSWI))
 """
 file = "$tmp_folder/settings_swi.txt"
-@test read(file, String) == text
+written = read(file, String)
+# The record now opens with a version header, so that a steps folder on its own
+# says which code produced it.
+@test endswith(written, text)
+@test occursin("# CLEARSWI $(pkgversion(CLEARSWI))", written)
+@test occursin("# julia: $VERSION", written)
+@test occursin("# MriResearchTools: $(pkgversion(CLEARSWI.MriResearchTools))", written)
 rm(file)
+
+# The references for what produced the folder belong next to the settings that
+# produced it, and must cover only the methods this configuration uses.
+citefile = "$tmp_folder/citations_swi.txt"
+citations = read(citefile, String)
+@test occursin("CLEAR-SWI", citations)
+@test occursin("Fast phase unwrapping algorithm", citations)  # phase_unwrap = laplacian
+@test !occursin("Rapid Opensource Minimum Spanning", citations) # ROMEO was not used
+@test !occursin("Langkammer", citations)                        # qsm = false
+rm(citefile)
 try rm(tmp_folder) catch end
 
 @test isdir(CLEARSWI.dir("test", "data", "small"))

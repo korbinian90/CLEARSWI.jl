@@ -72,10 +72,16 @@ end
 """
     saveconfiguration(options::Options, path=options.writesteps)
 
-Saves the configuration in the file "settings_swi.txt" under `path`
+Saves the configuration in "settings_swi.txt" and the references for the methods
+this configuration actually uses in "citations_swi.txt", both under `path`.
 """
 function saveconfiguration(options::Options, path=options.writesteps)
-    open(joinpath(path, "settings_swi.txt"), "w") do io        
+    open(joinpath(path, "settings_swi.txt"), "w") do io
+        println(io, "# CLEARSWI $(pkgversion(CLEARSWI))")
+        println(io, "# julia: $VERSION")
+        println(io, "# MriResearchTools: $(pkgversion(MriResearchTools))")
+        println(io, "# ROMEO: $(pkgversion(MriResearchTools.ROMEO))")
+        println(io)
         for fname in fieldnames(typeof(options))
             val = getfield(options, fname)
             if !(val isa AbstractArray && !(val isa Vector))
@@ -84,4 +90,26 @@ function saveconfiguration(options::Options, path=options.writesteps)
         end
         println(io, "CLEARSWI.jl github version-tag: $(pkgversion(CLEARSWI))")
     end
+    write_citations_swi(options, path)
+end
+
+# The steps folder is often the only thing that travels with a result, so the
+# references for what produced it belong next to the settings that produced it.
+function write_citations_swi(options::Options, path)
+    cite = [:clearswi]
+    if isnothing(options.mag_sens) || options.mag_sens isa Pair
+        push!(cite, :homogeneity) # sensitivity was estimated rather than supplied
+    end
+    if options.qsm === true
+        append!(cite, [:tgv, :tgv_original, :romeo, :aspire])
+    elseif options.phase_unwrap === :romeo
+        push!(cite, :romeo)
+    elseif startswith(String(options.phase_unwrap), "laplacian")
+        push!(cite, :laplacian)
+    end
+
+    # One writer for the whole family, so the steps folder gets the same warning
+    # about an unregistered citation that the CLIs get, instead of skipping it
+    # silently, and the notices header is printed once rather than per notice.
+    write_citations(path, "swi"; cite)
 end

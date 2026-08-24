@@ -16,8 +16,6 @@ function CLEARSWI.clearswi_main(args; version="1.6.0")
     mkpath(writedir)
     if !isnothing(settings["writesteps"]) mkpath(settings["writesteps"]) end
 
-    saveconfiguration(writedir, settings, args, version)
-
     mag = readmag(settings["magnitude"]; mmap=!settings["no-mmap"])
     hdr = CLEARSWI.MriResearchTools.header(mag)
     if isnothing(settings["qsm-input"])
@@ -50,6 +48,14 @@ function CLEARSWI.clearswi_main(args; version="1.6.0")
     if 1 < length(echoes) && length(echoes) != length(TEs)
         error("Number of chosen echoes is $(length(echoes)) ($neco in .nii data), but $(length(TEs)) TEs were specified!")
     end
+
+    # Written here rather than before loading, so the record holds the resolved
+    # echo times and echo count instead of only the raw arguments, and so the
+    # citation list can depend on them.
+    settings["resolved-echo-times"] = TEs
+    settings["resolved-echoes"] = echoes
+    settings["number-of-echoes"] = neco
+    saveconfiguration(writedir, settings, args, version)
     
     echoes = getechoes(settings, neco)
     if echoes != 1:neco
