@@ -108,11 +108,9 @@ function exception_handler(settings::ArgParseSettings, err, err_code::Int=1)
 end
 
 function getechoes(settings, neco)
-    echoes = eval(Meta.parse(join(settings["echoes"], " ")))
+    echoes = MriResearchTools.ROMEO.parse_array(settings["echoes"])
     if echoes isa Int
         echoes = [echoes]
-    elseif echoes isa Matrix
-        echoes = echoes[:]
     end
     echoes = (1:neco)[echoes] # expands ":"
     if (length(echoes) == 1) echoes = echoes[1] end
@@ -130,10 +128,7 @@ function getTEs(settings, neco, echoes)
     TEs = if settings["echo-times"][1] == "epi"
         ones(neco) .* if length(settings["echo-times"]) > 1; parse(Float64, settings["echo-times"][2]) else 1 end
     else
-        eval(Meta.parse(join(settings["echo-times"], " ")))
-    end
-    if TEs isa Matrix
-        TEs = TEs[:]
+        MriResearchTools.ROMEO.parse_array(settings["echo-times"])
     end
     if length(TEs) == neco
         TEs = TEs[echoes]
@@ -173,10 +168,24 @@ function saveconfiguration(writedir, settings, args, version)
         end
     end
 
+    # The QSM implementation is a weak dependency of MriResearchTools, so it is
+    # not nameable here - but when it ran, its version is exactly what the record
+    # needs, so look the loaded module up and add it.
+    packages = Any[CLEARSWI, MriResearchTools, MriResearchTools.ROMEO]
+    if :tgv in cite
+        tgv = _loaded_module("QuantitativeSusceptibilityMappingTGV",
+                             "bd393529-335a-4aed-902f-5de61cc7ff49")
+        tgv === nothing || push!(packages, tgv)
+    end
+
     write_provenance(writedir, "clearswi";
         version, args, settings, cite,
         optional = [:julia],
         inputs = ["magnitude" => settings["magnitude"], "phase" => settings["phase"]],
-        packages = [CLEARSWI, MriResearchTools, MriResearchTools.ROMEO],
+        packages,
+        describe = describe_input,
     )
 end
+
+_loaded_module(name, uuid) =
+    get(Base.loaded_modules, Base.PkgId(Base.UUID(uuid), name), nothing)

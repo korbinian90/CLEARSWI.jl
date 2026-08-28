@@ -101,7 +101,7 @@ function write_citations_swi(options::Options, path)
         push!(cite, :homogeneity) # sensitivity was estimated rather than supplied
     end
     if options.qsm === true
-        append!(cite, [:tgv, :tgv_original, :romeo, :aspire])
+        append!(cite, [:tgv, :tgv_original, :romeo, :mcpc3ds])
     elseif options.phase_unwrap === :romeo
         push!(cite, :romeo)
     elseif startswith(String(options.phase_unwrap), "laplacian")
