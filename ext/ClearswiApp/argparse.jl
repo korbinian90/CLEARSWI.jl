@@ -160,17 +160,12 @@ function saveconfiguration(writedir, settings, args, version)
         # MCPC-3D-S first when there is more than one echo.
         push!(cite, :romeo)
         if get(settings, "number-of-echoes", 1) > 1
-            # MCPC-3D-S, not ASPIRE: the two share the ASPIRE paper as their
-            # reference, but mcpc3ds unwraps with ROMEO on every path and never
-            # takes the ASPIRE shortcut, so the patented method is not the one
-            # that runs here.
             push!(cite, :mcpc3ds)
         end
     end
 
-    # The QSM implementation is a weak dependency of MriResearchTools, so it is
-    # not nameable here - but when it ran, its version is exactly what the record
-    # needs, so look the loaded module up and add it.
+    # The QSM implementation is a weak dependency of MriResearchTools and cannot
+    # be named here, so look the loaded module up when it ran.
     packages = Any[CLEARSWI, MriResearchTools, MriResearchTools.ROMEO]
     if :tgv in cite
         tgv = _loaded_module("QuantitativeSusceptibilityMappingTGV",
