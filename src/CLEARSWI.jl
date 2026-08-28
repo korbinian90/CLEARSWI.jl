@@ -18,7 +18,8 @@ function __init__()
         """Eckstein, K., Bachrata, B., Hangel, G., Widhalm, G., Enzinger, C., Barth, M., Trattnig, S., Robinson, S.D., 2021.
            Improved susceptibility weighted imaging at ultra-high field using bipolar multi-echo acquisition and optimized image processing: CLEAR-SWI.
            NeuroImage 237, 118175.
-           https://doi.org/10.1016/j.neuroimage.2021.118175""")
+           https://doi.org/10.1016/j.neuroimage.2021.118175""";
+        label = "CLEAR-SWI")
 end
 
 clearswi_main(args...; kwargs...) = @warn("Type `using MriResearchTools ArgParse` to use this function \n `?clearswi_main` for argument help")
