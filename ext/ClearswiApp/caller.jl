@@ -97,7 +97,8 @@ function CLEARSWI.clearswi_main(args; version="1.6.0")
                         error("The setting for mag-softplus-scaling is not valid: $(settings["mag-softplus-scaling"])")
                     end
     phase_unwrap = Symbol(settings["unwrapping-algorithm"])
-    phase_hp_sigma = eval(Meta.parse(join(settings["filter-size"], " ")))
+    phase_hp_sigma = MriResearchTools.ROMEO.parse_array(settings["filter-size"])
+    settings["filter-size"] = phase_hp_sigma
     phase_scaling_type = Symbol(settings["phase-scaling-type"])
     phase_scaling_strength = try parse(Int, settings["phase-scaling-strength"]) catch; parse(Float32, settings["phase-scaling-strength"]) end
     writesteps = settings["writesteps"]
