@@ -165,7 +165,11 @@ function saveconfiguration(writedir, settings, args, version)
         # MCPC-3D-S first when there is more than one echo.
         push!(cite, :romeo)
         if get(settings, "number-of-echoes", 1) > 1
-            push!(cite, :aspire)
+            # MCPC-3D-S, not ASPIRE: the two share the ASPIRE paper as their
+            # reference, but mcpc3ds unwraps with ROMEO on every path and never
+            # takes the ASPIRE shortcut, so the patented method is not the one
+            # that runs here.
+            push!(cite, :mcpc3ds)
         end
     end
 
