@@ -21,3 +21,8 @@ end
 ## print version to verify
 println()
 clearswi_main(["--version"])
+
+@testitem "Aqua" begin
+    using Aqua
+    Aqua.test_all(CLEARSWI)
+end
