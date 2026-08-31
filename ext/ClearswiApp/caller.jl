@@ -4,7 +4,10 @@ function CLEARSWI.clearswi_main(args; version="1.6.0")
     
     writedir = settings["output"]
     filename = "clearswi"
-    if occursin(r"\.nii$", writedir)
+    # ".nii.gz" as well as ".nii", which is what romeo has always accepted here.
+    # Matching only ".nii$" meant "-o out.nii.gz" was taken for a directory name
+    # and produced out.nii.gz/clearswi.nii.
+    if endswith(writedir, ".nii") || endswith(writedir, ".nii.gz")
         filename = basename(writedir)
         writedir = dirname(writedir)
     end
