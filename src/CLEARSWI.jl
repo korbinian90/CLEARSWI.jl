@@ -3,6 +3,11 @@ module CLEARSWI
 using MriResearchTools
 using Statistics
 
+# Evaluated while this package is precompiled, so the version is part of the
+# image and does not depend on path metadata being readable at run time. See
+# package_version, which prefers it over pkgversion.
+const PKG_VERSION = pkgversion(@__MODULE__)
+
 include("tissue.jl")
 include("utility.jl")
 include("functions.jl")
