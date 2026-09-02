@@ -2,7 +2,7 @@ function getargs(args::AbstractVector, version)
     if isempty(args)
         args = ["--help"]
     end
-    s = ArgParseSettings(
+    s = ArgParseSettings(;
         exc_handler=exception_handler,
         add_version=true,
         version,

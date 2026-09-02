@@ -77,10 +77,10 @@ this configuration actually uses in "citations_swi.txt", both under `path`.
 """
 function saveconfiguration(options::Options, path=options.writesteps)
     open(joinpath(path, "settings_swi.txt"), "w") do io
-        println(io, "# CLEARSWI $(pkgversion(CLEARSWI))")
+        println(io, "# CLEARSWI $(package_version(CLEARSWI))")
         println(io, "# julia: $VERSION")
-        println(io, "# MriResearchTools: $(pkgversion(MriResearchTools))")
-        println(io, "# ROMEO: $(pkgversion(MriResearchTools.ROMEO))")
+        println(io, "# MriResearchTools: $(package_version(MriResearchTools))")
+        println(io, "# ROMEO: $(package_version(MriResearchTools.ROMEO))")
         println(io)
         for fname in fieldnames(typeof(options))
             val = getfield(options, fname)
@@ -88,7 +88,7 @@ function saveconfiguration(options::Options, path=options.writesteps)
                 println(io, "$fname: " * string(val))
             end
         end
-        println(io, "CLEARSWI.jl github version-tag: $(pkgversion(CLEARSWI))")
+        println(io, "CLEARSWI.jl github version-tag: $(package_version(CLEARSWI))")
     end
     write_citations_swi(options, path)
 end

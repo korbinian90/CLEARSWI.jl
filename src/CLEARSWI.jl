@@ -3,6 +3,10 @@ module CLEARSWI
 using MriResearchTools
 using Statistics
 
+# Baked in at precompile time; include_dependency so a version bump invalidates the cache.
+include_dependency(joinpath(@__DIR__, "..", "Project.toml"))
+const PKG_VERSION = pkgversion(@__MODULE__)
+
 include("tissue.jl")
 include("utility.jl")
 include("functions.jl")
