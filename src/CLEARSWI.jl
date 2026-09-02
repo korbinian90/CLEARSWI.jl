@@ -3,14 +3,7 @@ module CLEARSWI
 using MriResearchTools
 using Statistics
 
-# Evaluated while this package is precompiled, so the version is part of the
-# image and does not depend on path metadata being readable at run time. See
-# package_version, which prefers it over pkgversion.
-#
-# The include_dependency is load bearing: a version bump edits only Project.toml,
-# which on its own does not invalidate the precompile cache, so without it the
-# constant kept the previous version until some source file changed. Caught by
-# the provenance test after the bump to this version.
+# Baked in at precompile time; include_dependency so a version bump invalidates the cache.
 include_dependency(joinpath(@__DIR__, "..", "Project.toml"))
 const PKG_VERSION = pkgversion(@__MODULE__)
 
