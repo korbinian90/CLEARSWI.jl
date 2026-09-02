@@ -1,4 +1,4 @@
-function CLEARSWI.clearswi_main(args; version="1.6.0")
+function CLEARSWI.clearswi_main(args; version=package_version(CLEARSWI))
     settings = getargs(args, version)
     if isnothing(settings) return end
     
