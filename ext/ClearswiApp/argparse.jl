@@ -108,7 +108,7 @@ function exception_handler(settings::ArgParseSettings, err, err_code::Int=1)
 end
 
 function getechoes(settings, neco)
-    echoes = MriResearchTools.ROMEO.parse_array(settings["echoes"])
+    echoes = MriResearchTools.parse_array(settings["echoes"])
     if echoes isa Int
         echoes = [echoes]
     end
@@ -128,7 +128,7 @@ function getTEs(settings, neco, echoes)
     TEs = if settings["echo-times"][1] == "epi"
         ones(neco) .* if length(settings["echo-times"]) > 1; parse(Float64, settings["echo-times"][2]) else 1 end
     else
-        MriResearchTools.ROMEO.parse_array(settings["echo-times"])
+        MriResearchTools.parse_array(settings["echo-times"])
     end
     if length(TEs) == neco
         TEs = TEs[echoes]
