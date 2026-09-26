@@ -3,12 +3,16 @@
 
 Defines a struct as input for `clearSWI`
 """
-struct Data
-    mag::AbstractArray
-    phase::AbstractArray
-    header
-    TEs::AbstractVector
-    Data(mag, phase, header, TEs) = new(float.(mag), float.(phase), header, vec(TEs))
+struct Data{M<:AbstractArray,P<:AbstractArray,H,T<:AbstractVector}
+    mag::M
+    phase::P
+    header::H
+    TEs::T
+    # The type parameters let a compiled program resolve every call on the data.
+    function Data(mag, phase, header, TEs)
+        m, p, t = float.(mag), float.(phase), vec(TEs)
+        return new{typeof(m),typeof(p),typeof(header),typeof(t)}(m, p, header, t)
+    end
 end
 function Data(mag, phase, header)
     if size(mag,4) != 1
@@ -52,20 +56,21 @@ end
 
 * Set `qsm` to true
 """
-struct Options
-    mag_combine
-    mag_sens::Union{AbstractArray, Nothing, Pair}
-    mag_softplus
+struct Options{C,S<:Union{AbstractArray,Nothing,Pair},P,H<:AbstractArray,R<:Real,Q<:Union{AbstractArray,Nothing}}
+    mag_combine::C
+    mag_sens::S
+    mag_softplus::P
     phase_unwrap::Symbol
-    phase_hp_sigma::AbstractArray
+    phase_hp_sigma::H
     phase_scaling_type::Symbol
-    phase_scaling_strength::Real
-    writesteps::Union{AbstractString, Nothing}
-    qsm::Union{Bool, Symbol}
-    qsm_mask::Union{AbstractArray, Nothing}
-    gpu::Union{Module, Nothing}
+    phase_scaling_strength::R
+    writesteps::Union{String,Nothing}
+    qsm::Union{Bool,Symbol}
+    qsm_mask::Q
+    gpu::Union{Module,Nothing}
 end
 function Options(; mag_combine=:SNR, mag_sens=nothing, mag_softplus=true, phase_unwrap=:laplacian, phase_hp_sigma=[4,4,0], phase_scaling_type=:tanh, phase_scaling_strength=4, writesteps=nothing, qsm=false, qsm_mask=nothing, gpu=nothing)
+    writesteps = writesteps === nothing ? nothing : String(writesteps)
     Options(mag_combine, mag_sens, mag_softplus, phase_unwrap, phase_hp_sigma, phase_scaling_type, phase_scaling_strength, writesteps, qsm, qsm_mask, gpu)
 end
 

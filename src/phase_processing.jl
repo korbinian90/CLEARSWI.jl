@@ -1,4 +1,19 @@
-function getswiphase(data, options)
+# The phase options, one by one for the same reason as in getswimag
+getswiphase(data, options) = getswiphase(data, PhaseOptions(options))
+
+struct PhaseOptions{H,R,Q}
+    phase_unwrap::Symbol
+    phase_hp_sigma::H
+    phase_scaling_type::Symbol
+    phase_scaling_strength::R
+    writesteps::Union{String,Nothing}
+    qsm::Union{Bool,Symbol}
+    qsm_mask::Q
+    gpu::Union{Module,Nothing}
+end
+PhaseOptions(o::Options) = PhaseOptions(o.phase_unwrap, o.phase_hp_sigma, o.phase_scaling_type, o.phase_scaling_strength, o.writesteps, o.qsm, o.qsm_mask, o.gpu)
+
+function getswiphase(data, options::PhaseOptions)
     mask = robustmask(view(data.mag,:,:,:,1))
     savenii(mask, "maskforphase", options.writesteps, data.header)
     combined = getcombinedphase(data, options, mask)
@@ -17,8 +32,9 @@ function createphasemask!(swiphase, mask, phase_scaling_type, phase_scaling_stre
     end
 
     if phase_scaling_type == :tanh
-        m = median(swiphase[mask .& (swiphase .> 0)])
-        m *= 10 / phase_scaling_strength
+        # one assignment: a variable the closure captures and that is assigned
+        # twice would have no static type
+        m = MriResearchTools._median!(swiphase[mask .& (swiphase .> 0)]) * (10 / phase_scaling_strength)
         f(x) = (1 + tanh(1 - x/m)) / 2
         swiphase .= f.(swiphase)
 
@@ -61,19 +77,25 @@ function getcombinedphase(data, options, mask)
         return romeo_combine(data, options, mask, save)
     end
 
-    error("Unwrapping $(options.phase_unwrap) ($(typeof(options.phase_unwrap))) not defined!")
+    error("Unwrapping $(options.phase_unwrap) not defined!")
 end
 
 function qsm_contrast(data, options, save)
-    vsz = data.header.pixdim[2:4]
-    TEs = to_dim(data.TEs, 4)
+    vsz = (data.header.pixdim[2], data.header.pixdim[3], data.header.pixdim[4])
+    TEs = to_dim(data.TEs, Val(4))
     mask = options.qsm_mask
     
     if isnothing(mask)
         mask = qsm_mask_filled(data.phase[:,:,:,1])
     end
 
-    combined = qsm_romeo_B0(data.phase, data.mag, mask, TEs, vsz, B0=3; gpu=options.gpu, save, iterations=800, erosions=0)
+    # the keyword arguments with static types: gpu is a module or nothing
+    gpu = options.gpu
+    combined = if gpu === nothing
+        qsm_romeo_B0(data.phase, data.mag, mask, TEs, vsz, B0=3; gpu=nothing, save, iterations=800, erosions=0)
+    else
+        qsm_romeo_B0(data.phase, data.mag, mask, TEs, vsz, B0=3; gpu, save, iterations=800, erosions=0)
+    end
     save(combined, "qsm_romeo_B0")
     combined = high_pass_qsm(combined, options, mask, save)
     return combined
@@ -86,7 +108,7 @@ function high_pass_qsm(qsm, options, mask, save)
 end
 
 function laplacian_combine(data, options, mask, save)
-    TEs = to_dim(data.TEs, 4)
+    TEs = to_dim(data.TEs, Val(4))
     unwrapped = similar(data.phase)
     for iEco in axes(data.phase, 4)
         unwrapped[:,:,:,iEco] .= laplacianunwrap(view(data.phase,:,:,:,iEco))
@@ -104,7 +126,7 @@ function laplacian_combine(data, options, mask, save)
 end
 
 function laplacianslice_combine(data, options, mask, save)
-    TEs = to_dim(data.TEs, 4)
+    TEs = to_dim(data.TEs, Val(4))
     unwrapped = similar(data.phase)
     for iEco in axes(data.phase, 4), iSlc in axes(data.phase, 3)
         unwrapped[:,:,iSlc,iEco] .= laplacianunwrap(view(data.phase,:,:,iSlc,iEco))
@@ -118,7 +140,7 @@ function laplacianslice_combine(data, options, mask, save)
 end
 
 function romeo_combine(data, options, mask, save)
-    TEs = to_dim(data.TEs, 4)
+    TEs = to_dim(data.TEs, Val(4))
     unwrapped = romeo(data.phase; data.mag, TEs)#, mask = mask)
     save(unwrapped, "unwrappedphase")
 

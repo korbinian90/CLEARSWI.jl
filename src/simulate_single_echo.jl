@@ -1,12 +1,12 @@
 function simulate_single_echo_mag(mag, TEs, TE_SE=mean(TEs))
     weighting = get_single_echo_weighting(TEs, TE_SE)
-    weighting = to_dim(weighting, 4)
+    weighting = to_dim(weighting, Val(4))
     return dropdims(sum(mag .* weighting; dims=4); dims=4)
 end
 
 function get_single_echo_weighting(TEs, TE_SE)
     if TE_SE < TEs[1] || TE_SE > TEs[end]
-        error("Not possible to simulate TE=$TE_SE from $TEs !")
+        error("Not possible to simulate TE=$TE_SE from [$(join(TEs, ", "))] !")
     end
     ΔTE = TEs[2] - TEs[1]
     echoend_ME = TEs[end] + ΔTE / 2
@@ -24,7 +24,7 @@ function get_single_echo_weighting(TEs, echostart_sim, echoend_sim)
     echoend_ME = TEs[end] + ΔTE / 2
     echostart_ME = TEs[1] - ΔTE / 2
     if (echostart_sim + 1e-5) < echostart_ME || (echoend_sim - 1e-5) > echoend_ME || (echoend_sim - echostart_sim + 1e-5) < ΔTE
-        error("Not possible to simulate [$(echostart_sim);$(echoend_sim)] from $TEs !")
+        error("Not possible to simulate [$(echostart_sim);$(echoend_sim)] from [$(join(TEs, ", "))] !")
     end
     weighting = ones(length(TEs))
     if echostart_sim > echostart_ME

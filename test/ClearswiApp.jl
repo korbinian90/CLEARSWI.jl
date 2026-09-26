@@ -1,4 +1,4 @@
-using ArgParse, QuantitativeSusceptibilityMappingTGV
+using QuantitativeSusceptibilityMappingTGV
 
 original_path = abspath(".")
 p = CLEARSWI.dir("test", "data", "small")
