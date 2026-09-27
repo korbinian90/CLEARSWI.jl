@@ -37,9 +37,9 @@ function CLEARSWI.clearswi_main(args; version=package_version(CLEARSWI))
         getechoes(settings, neco)
     catch y
         if isa(y, BoundsError)
-            error("echoes=$(join(settings["unwrap-echoes"], " ")): specified echo out of range! Number of echoes is $neco")
+            error("echoes=$(join(settings["echoes"], " ")): specified echo out of range! Number of echoes is $neco")
         else
-            error("echoes=$(join(settings["unwrap-echoes"], " ")) wrongly formatted!")
+            error("echoes=$(join(settings["echoes"], " ")) wrongly formatted!")
         end
     end
     settings["verbose"] && println("Echoes are $echoes")
