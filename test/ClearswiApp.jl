@@ -87,6 +87,15 @@ test_clearswi(["-p", phasefile_1eco, "-m", magfile_1eco, "-t", "5"])
 test_clearswi(["--qsm-input", phasefile_1eco, "-m", magfile_1eco])
 test_clearswi(["--qsm-input", phasefile_1arreco, "-m", magfile_1arreco, "-t", "5"])
 
+err = try
+    clearswi_main(["-p", phasefile_me, "-m", magfile_me, "-e", "[1,9]", "-t", "[2,4,6]", "-o", tempname()])
+    nothing
+catch e
+    e
+end
+@test err isa ErrorException
+@test occursin("echoes=[1,9]: specified echo out of range! Number of echoes is 3", sprint(showerror, err))
+
 ## TODO: Test error and warning messages
 
 cd(original_path)
