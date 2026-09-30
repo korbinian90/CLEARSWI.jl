@@ -21,8 +21,11 @@ julia> swi = calculateSWI(data, options);
 ```
 """
 function calculateSWI(data::Data, options::Options=Options())
-    getswimag(data, options) .* getswiphase(data, options)
+    multiply_parts(getswimag(data, options), getswiphase(data, options))
 end
+# Each part is Float32 or Float64, depending on the options. A function barrier rather
+# than a broadcast in place, so that every combination is compiled with static types.
+multiply_parts(swimag, swiphase) = swimag .* swiphase
 
 """
     createMIP(S::AbstractArray{<:Number,3}, d=7)

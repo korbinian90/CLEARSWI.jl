@@ -72,3 +72,16 @@ for i in eachindex(s), j in 1:(i-1)
         @show (i,j)
     end
 end
+
+# a mag_sens pair other than :sigma_mm => value is an error, not a division by the pair
+@test_throws ArgumentError calculateSWI(data, Options(mag_sens=:sigma=>7))
+
+# Without a QSM backend, which a statically compiled program leaves out, calculateSWI
+# infers as concrete arrays. A loaded backend adds the QSM path, whose type is not
+# inferable, so the check depends on no other test item having loaded one.
+qsm_backend = any(ext -> Base.get_extension(CLEARSWI.MriResearchTools, ext) !== nothing,
+                  (:QSMExt, :QuantitativeSusceptibilityMappingTGVExt))
+for o in (Options(), Options(mag_sens=:sigma_mm=>7), Options(phase_scaling_type=:positive, phase_scaling_strength=2))
+    T = only(Base.return_types(calculateSWI, (typeof(data), typeof(o))))
+    @test all(isconcretetype, Base.uniontypes(T)) skip=qsm_backend
+end

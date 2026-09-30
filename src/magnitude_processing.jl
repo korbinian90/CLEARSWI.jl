@@ -18,7 +18,8 @@ end
 function sensitivity_correction(combined_mag, data, sensitivity, writesteps)
     if isnothing(sensitivity)
         sensitivity = getsensitivity(data.mag, getpixdim(data))
-    elseif sensitivity isa Pair && first(sensitivity) == :sigma_mm
+    elseif sensitivity isa Pair
+        first(sensitivity) == :sigma_mm || throw(ArgumentError("mag_sens must be an array, nothing or :sigma_mm => value"))
         sensitivity = getsensitivity(data.mag, getpixdim(data); sigma_mm=last(sensitivity))
     end
     savenii(sensitivity, "sensitivity", writesteps, data.header)
