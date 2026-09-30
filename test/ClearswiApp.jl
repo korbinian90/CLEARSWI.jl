@@ -1,4 +1,4 @@
-using ArgParse, QuantitativeSusceptibilityMappingTGV
+using QuantitativeSusceptibilityMappingTGV
 
 original_path = abspath(".")
 p = CLEARSWI.dir("test", "data", "small")
@@ -95,6 +95,27 @@ catch e
 end
 @test err isa ErrorException
 @test occursin("echoes=[1,9]: specified echo out of range! Number of echoes is 3", sprint(showerror, err))
+
+me = ["-p", phasefile_me, "-m", magfile_me, "-t", "[2,4,6]"]
+
+# a wrong command line is reported through the return value
+@test redirect_stderr(() -> clearswi_main(["--bogus"]), devnull) == 1
+test_clearswi([me..., "--unwrapping", "romeo"]) # a unique prefix, as ArgParse accepted
+test_clearswi([me..., "--fix-ge-phase"])
+
+plain, out = tempname(), joinpath(tempname(), "swi.nii.gz")
+@test clearswi_main([me..., "-o", plain]) == 0
+@test clearswi_main([me..., "-o", out]) == 0
+@test Float32.(readmag(out)) == Float32.(readmag(joinpath(plain, "clearswi.nii")))
+
+# a sensitivity map from a file divides the combined magnitude
+sensfile = joinpath(tmpdir, "sens.nii")
+savenii(fill(2f0, size(readmag(magfile_me))[1:3]), sensfile)
+off, fromfile = tempname(), tempname()
+@test clearswi_main([me..., "--mag-sensitivity-correction", "off", "--mag-softplus-scaling", "off", "-o", off]) == 0
+@test clearswi_main([me..., "--mag-sensitivity-correction", sensfile, "--mag-softplus-scaling", "off", "-o", fromfile]) == 0
+@test Float32.(readmag(joinpath(fromfile, "clearswi.nii"))) ≈ Float32.(readmag(joinpath(off, "clearswi.nii"))) ./ 2
+@test occursin(sensfile, read(joinpath(fromfile, "settings_clearswi.txt"), String))
 
 ## TODO: Test error and warning messages
 
