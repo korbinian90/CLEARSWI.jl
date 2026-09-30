@@ -13,4 +13,4 @@ catch
 end
 
 @time msg = clearswi_main(ARGS)
-println(msg)
+exit(msg)
