@@ -38,8 +38,8 @@ const OPTIONS = [
         values for positive, negative and triangular phase scaling
         type. (default: 4)"""),
     CLI.Option("--echoes", "-e", "Load only the specified echoes from disk (default: :)"; nargs=:many),
-    CLI.Option("--no-mmap", "-N", """Deactivate memory mapping. Memory mapping might cause
-        problems on network storage"""; nargs=:none),
+    CLI.Option("--no-mmap", "-N", """Has no effect: the inputs are always read into memory.
+        Kept so that existing command lines still work."""; nargs=:none),
     CLI.Option("--no-phase-rescale", "", """Deactivate automatic rescaling of phase images. By
         default the input phase is rescaled to the range [-π;π]."""; nargs=:none),
     CLI.Option("--fix-ge-phase", "", """GE systems write corrupted phase output (slice jumps).
