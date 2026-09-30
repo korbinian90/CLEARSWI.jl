@@ -243,7 +243,7 @@ struct PhaseSettings
 end
 
 function _clearswi(opts, mag, phase, hdr, TEs, phase_options, mag_softplus, writedir, filename, mip_slices)
-    data = Data(mag, phase, hdr, TEs)
+    data = Data(NoCopy(), mag, phase, hdr, TEs)
     swimag = _swimag(opts, data, mag_softplus, phase_options.writesteps)
     swiphase = _swiphase(opts, data, phase_options)
     _write_swi(swimag, swiphase, hdr, writedir, filename, mip_slices)

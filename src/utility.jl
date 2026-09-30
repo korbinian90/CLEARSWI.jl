@@ -1,3 +1,5 @@
+struct NoCopy end
+
 """
     Data(mag, phase, header, TEs)
 
@@ -12,6 +14,11 @@ struct Data{M<:AbstractArray,P<:AbstractArray,H,T<:AbstractVector}
     function Data(mag, phase, header, TEs)
         m, p, t = float.(mag), float.(phase), vec(TEs)
         return new{typeof(m),typeof(p),typeof(header),typeof(t)}(m, p, header, t)
+    end
+    # Without the copy, for a caller that hands over arrays it no longer uses
+    function Data(::NoCopy, mag::AbstractArray{<:AbstractFloat}, phase::AbstractArray{<:AbstractFloat}, header, TEs)
+        t = vec(TEs)
+        return new{typeof(mag),typeof(phase),typeof(header),typeof(t)}(mag, phase, header, t)
     end
 end
 function Data(mag, phase, header)
