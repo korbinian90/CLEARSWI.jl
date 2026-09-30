@@ -23,8 +23,12 @@ meanIP = createIntensityProjection(swi, mean)
 
 # single-echo
 se_data = Data(mag_nii[:,:,:,1], phase_nii[:,:,:,1], hdr)
-swi = calculateSWI(data, Options(phase_unwrap=:romeo))
-mip = createMIP(swi)
+for o in (Options(), Options(phase_unwrap=:romeo))
+    se_swi = calculateSWI(se_data, o)
+    @test size(se_swi) == size(mag_nii)[1:3]
+    @test all(isfinite, se_swi)
+    createMIP(se_swi)
+end
 
 options = [
     Options()
