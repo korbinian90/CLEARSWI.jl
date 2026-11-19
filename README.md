@@ -1,3 +1,5 @@
+> **Research use only. Not a medical device. Not intended for diagnosis, treatment or clinical decisions.**
+
 [![Dev](https://img.shields.io/badge/docs-dev-blue.svg)](https://korbinian90.github.io/CLEARSWI.jl/dev)
 [![Build Status](https://github.com/korbinian90/CLEARSWI.jl/workflows/CI/badge.svg)](https://github.com/korbinian90/CLEARSWI.jl/actions)
 [![Codecov](https://codecov.io/gh/korbinian90/CLEARSWI.jl/branch/master/graph/badge.svg)](https://codecov.io/gh/korbinian90/CLEARSWI.jl)
